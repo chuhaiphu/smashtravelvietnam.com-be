@@ -3,32 +3,39 @@ services:
     image: ${DOCKER_IMAGE}:${VERSION}
     container_name: ${DOCKER_CONTAINER_NAME}
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - JWT_SECRET=${JWT_SECRET}
-      - VERSION=${VERSION}
-      - MEDIA_BASE_URL=${MEDIA_BASE_URL}
-      - UPLOAD_PATH=/app/public/media
-      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      VERSION: ${VERSION}
+      MEDIA_BASE_URL: ${MEDIA_BASE_URL}
+      UPLOAD_PATH: /app/public/media
+      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME}
+      SUPADMIN_EMAIL: ${SUPADMIN_EMAIL}
+      SUPADMIN_PASSWORD: ${SUPADMIN_PASSWORD}
+      SUPADMIN_NAME: ${SUPADMIN_NAME}
     volumes:
       - media_data:/app/public/media
     depends_on:
       - db
     restart: unless-stopped
     networks:
-      - smashtravelvietnam-be-network
+      - smashtravelvietnam-be
+      - vinaup-docker
 
   db:
     image: postgres:15
     container_name: smashtravelvietnam_postgres
     restart: always
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - smashtravelvietnam-be-network
+      - smashtravelvietnam-be
 
 volumes:
   postgres_data:
@@ -40,7 +47,8 @@ volumes:
       o: bind
 
 networks:
-  smashtravelvietnam-be-network:
+  smashtravelvietnam-be:
+    name: smashtravelvietnam-be
     driver: bridge
-  vinaup-docker-network:
+  vinaup-docker:
     external: true

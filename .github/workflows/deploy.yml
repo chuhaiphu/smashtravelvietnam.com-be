@@ -1,8 +1,8 @@
 name: Deploy to VPS with Docker Compose
 on:
   push:
-    tags:
-      - '*.*.*-alpha'  # Matches semantic versioning with -alpha suffix
+    tags: 
+      - 'v*.*.*' #Matches semantic versioning
 
 env:
   DOCKER_IMAGE: ${{ vars.DOCKER_IMAGE }}
@@ -48,7 +48,7 @@ jobs:
         key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
         port: 2222
         script: |
-          cd /opt/apps/smashtravelvietnam.com
+          cd /opt/apps/thevietnamtravel.com
 
           # Set environment variables directly in shell
           export DOCKER_IMAGE="${{ env.DOCKER_IMAGE }}"
@@ -61,6 +61,12 @@ jobs:
           export MEDIA_BASE_URL="${{ secrets.MEDIA_BASE_URL }}"
           export RECAPTCHA_SECRET_KEY="${{ secrets.RECAPTCHA_SECRET_KEY }}"
           export UPLOAD_PATH="/app/public/media"
+          export ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
+          export ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}"
+          export ADMIN_NAME="${{ secrets.ADMIN_NAME }}"
+          export SUPADMIN_EMAIL="${{ secrets.SUPADMIN_EMAIL }}"
+          export SUPADMIN_PASSWORD="${{ secrets.SUPADMIN_PASSWORD }}"
+          export SUPADMIN_NAME="${{ secrets.SUPADMIN_NAME }}"
           
           # Pull the latest images
           docker compose pull
