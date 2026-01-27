@@ -27,6 +27,8 @@ services:
 
   db:
     image: postgres:15
+    ports:
+      - "5433:5432"
     container_name: smashtravelvietnam_postgres
     restart: always
     environment:

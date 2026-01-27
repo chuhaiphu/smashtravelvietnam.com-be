@@ -8,6 +8,7 @@ import {
   HttpStatus,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -29,10 +30,12 @@ export class UploadController {
   async uploadImage(
     @Request() req: AuthenticatedRequest,
     @UploadedFile() file: Express.Multer.File,
+    @Query('folder') folder: string,
   ): Promise<HttpResponse<UploadResponseDto>> {
     const result = await this.uploadService.uploadImageByCurrentUser(
-      file,
       req.user.userId,
+      file,
+      folder,
     );
 
     return {

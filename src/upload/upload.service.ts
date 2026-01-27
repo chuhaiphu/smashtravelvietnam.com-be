@@ -24,8 +24,9 @@ export class UploadService {
   }
 
   async uploadImageByCurrentUser(
-    file: Express.Multer.File,
     userId: string,
+    file: Express.Multer.File,
+    folder?: string
   ): Promise<UploadResponseDto> {
     // Validate
     if (!file) throw new BadRequestException('File is required');
@@ -41,17 +42,17 @@ export class UploadService {
     const filename = `${generateUniqueCode()}.${ext}`;
 
     // Create paths
-    const folder = `user_${userId}`;
-    const folderPath = join(this.config.path, folder);
-    const filePath = join(folderPath, filename);
-    await this.uploadImage(file, filePath, folderPath)
+    const uploadFolderPath = join(this.config.uploadPath, `user_${userId}`, folder ?? "");
+    const filePath = join(uploadFolderPath, filename);
+    await this.uploadImage(file, filePath, uploadFolderPath);
 
+    const responseFolderPath = join(`user_${userId}`, folder ?? "")
     return {
       filename,
       originalName: file.originalname,
       mimetype: file.mimetype,
       size: file.size,
-      url: `${this.config.mediaBaseUrl}/${folder}/${filename}`,
+      url: `${this.config.mediaBaseUrl}/${this.config.mediaFolderDomain}/${responseFolderPath}/${filename}`,
       path: `${folder}/${filename}`,
       uploadedAt: new Date().toISOString(),
     };
@@ -59,7 +60,7 @@ export class UploadService {
 
   async deleteFile(relativePath: string): Promise<void> {
     if (!relativePath) throw new BadRequestException('Path is required');
-    const filePath = join(this.config.path, relativePath);
+    const filePath = join(this.config.uploadPath, relativePath);
     try {
       await fs.unlink(filePath);
     }

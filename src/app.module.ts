@@ -23,6 +23,7 @@ import { AppConfigModule } from './app-config/app-config.module';
 import { SmtpConfigModule } from './smtp-config/smtp-config.module';
 import { ActionLogModule } from './action-log/action-log.module';
 import { MailModule } from './mail/mail.module';
+import { SectionUIModule } from './section-ui/section-ui.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MailModule } from './mail/mail.module';
     SmtpConfigModule,
     ActionLogModule,
     MailModule,
+    SectionUIModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthExceptionFilter, AppExceptionFilter],
