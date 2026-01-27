@@ -12,15 +12,14 @@ export class BlogResponseDto {
   sortOrder: number;
   videoUrl: string | null;
   videoThumbnailUrl: string | null;
-  videoPosition: string;
+  videoPosition: string | null;
   mainImageUrl: string | null;
   additionalImageUrls: string[];
-  additionalImagesPosition: string;
+  additionalImagesPosition: string | null;
   likes: number;
   views: number;
-  createdByUserId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  createdBy?: User | null;
   blogCategoryBlogs?: BlogCategoryBlog[];
-  createdBy?: Pick<User, 'id' | 'name' | 'email'> | null;
 }

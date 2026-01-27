@@ -23,12 +23,12 @@ export class BlogService {
       throw new ConflictException('Blog with this endpoint already exists');
     }
 
-    const { categoryIds, ...blogData } = dto;
+    const { categoryIds, userId: dtoUserId, ...blogData } = dto;
 
     const blog = await this.prismaService.blog.create({
       data: {
         ...blogData,
-        createdByUserId: userId,
+        createdByUserId: dtoUserId || userId || undefined,
         blogCategoryBlogs: categoryIds?.length
           ? {
               create: categoryIds.map((categoryId, index) => ({
@@ -41,20 +41,18 @@ export class BlogService {
       include: {
         blogCategoryBlogs: {
           include: {
-            blogCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
     });
 
-    return blog;
+    return blog ;
   }
 
   async findAll(filter: BlogFilterParamDto): Promise<BlogResponseDto[]> {
@@ -79,20 +77,19 @@ export class BlogService {
 
     const blogs = await this.prismaService.blog.findMany({
       where,
-      orderBy: {
-        [filter.sortBy || 'createdAt']: filter.sortOrder || 'desc',
-      },
+      orderBy: [
+        { updatedAt: 'desc' },
+        { sortOrder: 'asc' },
+      ],
       include: {
         blogCategoryBlogs: {
           include: {
-            blogCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -102,10 +99,131 @@ export class BlogService {
   }
 
   async findAllPublic(filter: BlogFilterParamDto): Promise<BlogResponseDto[]> {
-    return this.findAll({
-      ...filter,
+    const where: Prisma.BlogWhereInput = {
       visibility: 'public',
+    };
+
+    if (filter.search) {
+      where.OR = [
+        { title: { contains: filter.search, mode: 'insensitive' } },
+        { description: { contains: filter.search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (filter.categoryId) {
+      where.blogCategoryBlogs = {
+        some: { blogCategoryId: filter.categoryId },
+      };
+    }
+
+    const blogs = await this.prismaService.blog.findMany({
+      where,
+      orderBy: [
+        { sortOrder: 'asc' },
+        { updatedAt: 'desc' },
+      ],
+      include: {
+        blogCategoryBlogs: {
+          include: {
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
+          },
+        },
+      },
     });
+
+    return blogs;
+  }
+
+  async findAllPublicBlogsPinnedToHome(): Promise<BlogResponseDto[]> {
+    const blogs = await this.prismaService.blog.findMany({
+      where: {
+        visibility: 'public',
+        sortOrder: {
+          not: -1,
+        },
+      },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { updatedAt: 'desc' },
+      ],
+      include: {
+        blogCategoryBlogs: {
+          include: {
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return blogs;
+  }
+
+  async findBlogsByUserId(userId: string): Promise<BlogResponseDto[]> {
+    const blogs = await this.prismaService.blog.findMany({
+      where: {
+        createdByUserId: userId,
+      },
+      orderBy: [
+        { updatedAt: 'desc' },
+      ],
+      include: {
+        blogCategoryBlogs: {
+          include: {
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return blogs;
+  }
+
+  async hasViewedToday(blogId: string, ipAddress: string): Promise<boolean> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const view = await this.prismaService.blogView.findFirst({
+      where: {
+        blogId,
+        ipAddress,
+        viewedAt: {
+          gte: today,
+          lt: tomorrow,
+        },
+      },
+    });
+
+    return !!view;
+  }
+
+  async hasLiked(blogId: string, ipAddress: string): Promise<boolean> {
+    const like = await this.prismaService.blogLike.findUnique({
+      where: {
+        blogId_ipAddress: {
+          blogId,
+          ipAddress,
+        },
+      },
+    });
+
+    return !!like;
   }
 
   async findById(id: string): Promise<BlogResponseDto> {
@@ -114,14 +232,12 @@ export class BlogService {
       include: {
         blogCategoryBlogs: {
           include: {
-            blogCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -131,7 +247,7 @@ export class BlogService {
       throw new NotFoundException('Blog not found');
     }
 
-    return blog;
+    return blog ;
   }
 
   async findByEndpoint(endpoint: string): Promise<BlogResponseDto> {
@@ -140,7 +256,12 @@ export class BlogService {
       include: {
         blogCategoryBlogs: {
           include: {
-            blogCategory: true,
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -150,7 +271,7 @@ export class BlogService {
       throw new NotFoundException('Blog not found');
     }
 
-    return blog;
+    return blog ;
   }
 
   async update(id: string, dto: UpdateBlogRequestDto): Promise<BlogResponseDto> {
@@ -195,20 +316,18 @@ export class BlogService {
       include: {
         blogCategoryBlogs: {
           include: {
-            blogCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            blogCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
     });
 
-    return updatedBlog;
+    return updatedBlog ;
   }
 
   async delete(id: string) {
@@ -236,28 +355,33 @@ export class BlogService {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
     const existingView = await this.prismaService.blogView.findFirst({
       where: {
         blogId: id,
         ipAddress,
-        viewedAt: { gte: today },
+        viewedAt: {
+          gte: today,
+          lt: tomorrow,
+        },
       },
     });
 
     if (!existingView) {
-      await this.prismaService.$transaction([
-        this.prismaService.blogView.create({
+      await this.prismaService.$transaction(async (tx) => {
+        await tx.blogView.create({
           data: {
             blogId: id,
             ipAddress,
           },
-        }),
-        this.prismaService.blog.update({
+        });
+        await tx.blog.update({
           where: { id },
           data: { views: { increment: 1 } },
-        }),
-      ]);
+        });
+      });
     }
 
     return { success: true };
@@ -272,31 +396,41 @@ export class BlogService {
       throw new NotFoundException('Blog not found');
     }
 
-    const existingLike = await this.prismaService.blogLike.findFirst({
-      where: { blogId: id, ipAddress },
+    const existingLike = await this.prismaService.blogLike.findUnique({
+      where: {
+        blogId_ipAddress: {
+          blogId: id,
+          ipAddress,
+        },
+      },
     });
 
     if (existingLike) {
-      await this.prismaService.$transaction([
-        this.prismaService.blogLike.delete({
-          where: { id: existingLike.id },
-        }),
-        this.prismaService.blog.update({
+      await this.prismaService.$transaction(async (tx) => {
+        await tx.blogLike.delete({
+          where: {
+            blogId_ipAddress: {
+              blogId: id,
+              ipAddress,
+            },
+          },
+        });
+        await tx.blog.update({
           where: { id },
           data: { likes: { decrement: 1 } },
-        }),
-      ]);
+        });
+      });
       return { liked: false };
     } else {
-      await this.prismaService.$transaction([
-        this.prismaService.blogLike.create({
+      await this.prismaService.$transaction(async (tx) => {
+        await tx.blogLike.create({
           data: { blogId: id, ipAddress },
-        }),
-        this.prismaService.blog.update({
+        });
+        await tx.blog.update({
           where: { id },
           data: { likes: { increment: 1 } },
-        }),
-      ]);
+        });
+      });
       return { liked: true };
     }
   }

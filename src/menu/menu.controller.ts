@@ -56,6 +56,19 @@ export class MenuController {
     };
   }
 
+  @Get('admin/available-sort-orders/:parentId')
+  @UseGuards(JwtAuthGuard)
+  async findAvailableSortOrders(
+    @Param('parentId') parentId: string
+  ): Promise<HttpResponse<number[]>> {
+    const sortOrders = await this.menuService.findAvailableSortOrders(parentId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Available sort orders retrieved successfully',
+      data: sortOrders,
+    };
+  }
+
   @Get('admin/:id')
   @UseGuards(JwtAuthGuard)
   async findById(@Param('id') id: string): Promise<HttpResponse<MenuResponseDto>> {

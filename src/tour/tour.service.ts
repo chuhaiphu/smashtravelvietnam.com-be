@@ -23,12 +23,12 @@ export class TourService {
       throw new ConflictException('Tour with this endpoint already exists');
     }
 
-    const { categoryIds, ...tourData } = dto;
+    const { categoryIds, userId: dtoUserId, ...tourData } = dto;
 
     const tour = await this.prismaService.tour.create({
       data: {
         ...tourData,
-        createdByUserId: userId,
+        createdByUserId: dtoUserId || userId || undefined,
         tourCategoryTours: categoryIds?.length
           ? {
               create: categoryIds.map((categoryId, index) => ({
@@ -41,14 +41,12 @@ export class TourService {
       include: {
         tourCategoryTours: {
           include: {
-            tourCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -79,33 +77,153 @@ export class TourService {
 
     const tours = await this.prismaService.tour.findMany({
       where,
-      orderBy: {
-        [filter.sortBy || 'createdAt']: filter.sortOrder || 'desc',
-      },
+      orderBy: [
+        { updatedAt: 'desc' },
+        { sortOrder: 'asc' },
+      ],
       include: {
         tourCategoryTours: {
           include: {
-            tourCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
     });
 
-    return tours;
+    return tours  ;
   }
 
   async findAllPublic(filter: TourFilterParamDto): Promise<TourResponseDto[]> {
-    return this.findAll({
-      ...filter,
+    const where: Prisma.TourWhereInput = {
       visibility: 'public',
+    };
+
+    if (filter.search) {
+      where.OR = [
+        { title: { contains: filter.search, mode: 'insensitive' } },
+        { description: { contains: filter.search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (filter.categoryId) {
+      where.tourCategoryTours = {
+        some: { tourCategoryId: filter.categoryId },
+      };
+    }
+
+    const tours = await this.prismaService.tour.findMany({
+      where,
+      orderBy: [
+        { sortOrder: 'asc' },
+        { updatedAt: 'desc' },
+      ],
+      include: {
+        tourCategoryTours: {
+          include: {
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
+          },
+        },
+      },
     });
+
+    return tours  ;
+  }
+
+  async findAllPublicToursPinnedToHome(): Promise<TourResponseDto[]> {
+    const tours = await this.prismaService.tour.findMany({
+      where: {
+        visibility: 'public',
+        sortOrder: {
+          not: -1,
+        },
+      },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { updatedAt: 'desc' },
+      ],
+      include: {
+        tourCategoryTours: {
+          include: {
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return tours  ;
+  }
+
+  async findToursByUserId(userId: string): Promise<TourResponseDto[]> {
+    const tours = await this.prismaService.tour.findMany({
+      where: {
+        createdByUserId: userId,
+      },
+      orderBy: [
+        { updatedAt: 'desc' },
+      ],
+      include: {
+        tourCategoryTours: {
+          include: {
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return tours  ;
+  }
+
+  async hasViewedToday(tourId: string, ipAddress: string): Promise<boolean> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const view = await this.prismaService.tourView.findFirst({
+      where: {
+        tourId,
+        ipAddress,
+        viewedAt: {
+          gte: today,
+          lt: tomorrow,
+        },
+      },
+    });
+
+    return !!view;
+  }
+
+  async hasLiked(tourId: string, ipAddress: string): Promise<boolean> {
+    const like = await this.prismaService.tourLike.findUnique({
+      where: {
+        tourId_ipAddress: {
+          tourId,
+          ipAddress,
+        },
+      },
+    });
+
+    return !!like;
   }
 
   async findById(id: string): Promise<TourResponseDto> {
@@ -114,14 +232,12 @@ export class TourService {
       include: {
         tourCategoryTours: {
           include: {
-            tourCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -131,7 +247,7 @@ export class TourService {
       throw new NotFoundException('Tour not found');
     }
 
-    return tour;
+    return tour  ;
   }
 
   async findByEndpoint(endpoint: string): Promise<TourResponseDto> {
@@ -140,7 +256,12 @@ export class TourService {
       include: {
         tourCategoryTours: {
           include: {
-            tourCategory: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -150,7 +271,7 @@ export class TourService {
       throw new NotFoundException('Tour not found');
     }
 
-    return tour;
+    return tour  ;
   }
 
   async update(id: string, dto: UpdateTourRequestDto): Promise<TourResponseDto> {
@@ -196,20 +317,18 @@ export class TourService {
       include: {
         tourCategoryTours: {
           include: {
-            tourCategory: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
     });
 
-    return updatedTour;
+    return updatedTour  ;
   }
 
   async delete(id: string) {
@@ -238,12 +357,17 @@ export class TourService {
     // Check if already viewed today from this IP
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
     const existingView = await this.prismaService.tourView.findFirst({
       where: {
         tourId: id,
         ipAddress,
-        viewedAt: { gte: today },
+        viewedAt: {
+          gte: today,
+          lt: tomorrow,
+        },
       },
     });
 
@@ -274,14 +398,24 @@ export class TourService {
       throw new NotFoundException('Tour not found');
     }
 
-    const existingLike = await this.prismaService.tourLike.findFirst({
-      where: { tourId: id, ipAddress },
+    const existingLike = await this.prismaService.tourLike.findUnique({
+      where: {
+        tourId_ipAddress: {
+          tourId: id,
+          ipAddress,
+        },
+      },
     });
 
     if (existingLike) {
       await this.prismaService.$transaction([
         this.prismaService.tourLike.delete({
-          where: { id: existingLike.id },
+          where: {
+            tourId_ipAddress: {
+              tourId: id,
+              ipAddress,
+            },
+          },
         }),
         this.prismaService.tour.update({
           where: { id },

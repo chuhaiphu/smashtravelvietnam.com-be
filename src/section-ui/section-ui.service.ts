@@ -39,11 +39,11 @@ export class SectionUIService {
   ): DynamicSectionUIResponseDto {
     return {
       ...section,
-      properties: section.properties as object | null,
+      properties: section.properties as Record<string, unknown> | null,
       sectionUICredentials: section.sectionUICredentials
         ? {
             ...section.sectionUICredentials,
-            propertyFormat: section.sectionUICredentials.propertyFormat as object,
+            propertyFormat: section.sectionUICredentials.propertyFormat as Record<string, unknown>,
           }
         : null,
     };
@@ -71,7 +71,7 @@ export class SectionUIService {
 
     return {
       ...credential,
-      propertyFormat: credential.propertyFormat as object,
+      propertyFormat: credential.propertyFormat as Record<string, unknown>,
     };
   }
 
@@ -82,7 +82,7 @@ export class SectionUIService {
 
     return credentials.map((credential) => ({
       ...credential,
-      propertyFormat: credential.propertyFormat as object,
+      propertyFormat: credential.propertyFormat as Record<string, unknown>,
     }));
   }
 
@@ -99,7 +99,7 @@ export class SectionUIService {
 
     return {
       ...credential,
-      propertyFormat: credential.propertyFormat as object,
+      propertyFormat: credential.propertyFormat as Record<string, unknown>,
     };
   }
 
@@ -116,7 +116,7 @@ export class SectionUIService {
 
     return {
       ...credential,
-      propertyFormat: credential.propertyFormat as object,
+      propertyFormat: credential.propertyFormat as Record<string, unknown>,
     };
   }
 
@@ -130,7 +130,7 @@ export class SectionUIService {
 
     return credentials.map((credential) => ({
       ...credential,
-      propertyFormat: credential.propertyFormat as object,
+      propertyFormat: credential.propertyFormat as Record<string, unknown>,
     }));
   }
 
@@ -177,7 +177,7 @@ export class SectionUIService {
 
     return {
       ...updatedCredential,
-      propertyFormat: updatedCredential.propertyFormat as object,
+      propertyFormat: updatedCredential.propertyFormat as Record<string, unknown>,
     };
   }
 

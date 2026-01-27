@@ -12,6 +12,9 @@ import { TourModule } from './tour/tour.module';
 import { TourCategoryModule } from './tour-category/tour-category.module';
 import { BlogModule } from './blog/blog.module';
 import { BlogCategoryModule } from './blog-category/blog-category.module';
+import { BlogCategoryBlogModule } from './blog-category-blog/blog-category-blog.module';
+import { TourCategoryTourModule } from './tour-category-tour/tour-category-tour.module';
+import { TourCategoryCustomTourRequestModule } from './tour-category-custom-tour-request/tour-category-custom-tour-request.module';
 import { PageModule } from './page/page.module';
 import { MenuModule } from './menu/menu.module';
 import { BookingModule } from './booking/booking.module';
@@ -42,6 +45,9 @@ import { SectionUIModule } from './section-ui/section-ui.module';
     TourCategoryModule,
     BlogModule,
     BlogCategoryModule,
+    BlogCategoryBlogModule,
+    TourCategoryTourModule,
+    TourCategoryCustomTourRequestModule,
     PageModule,
     MenuModule,
     BookingModule,

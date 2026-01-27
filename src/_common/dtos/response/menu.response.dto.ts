@@ -4,7 +4,6 @@ export class MenuResponseDto {
   id: string;
   title: string;
   description: string | null;
-  parentId: string | null;
   targetType: string;
   targetId: string | null;
   customUrl: string | null;

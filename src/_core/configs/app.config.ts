@@ -2,8 +2,8 @@ import { registerAs } from '@nestjs/config';
 import { CookieOptions } from 'express';
 import { ONE_DAY } from 'src/_common/constants/time.constant';
 import {
-  CLIENT_URI_LOCAL,
-  CLIENT_URI_PRODUCTION,
+  CLIENT_URL_LOCAL,
+  CLIENT_URL_PRODUCTION,
   CLIENT_DOMAIN_PRODUCTION,
 } from 'src/_common/constants/uri.constant';
 
@@ -30,7 +30,7 @@ export default registerAs('app', (): AppConfig => {
   const isProduction = process.env.NODE_ENV === 'production';
   return {
     cors: {
-      origin: isProduction ? [CLIENT_URI_PRODUCTION] : [CLIENT_URI_LOCAL],
+      origin: isProduction ? [CLIENT_URL_PRODUCTION] : [CLIENT_URL_LOCAL],
     },
     cookies: {
       accessToken: {

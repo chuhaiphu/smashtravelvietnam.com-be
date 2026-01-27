@@ -126,7 +126,7 @@ export class BookingService {
 
     const bookings = await this.prismaService.booking.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { updatedAt: 'desc' },
       include: {
         tour: true,
       },

@@ -65,7 +65,12 @@ export class CustomTourRequestService {
       include: {
         tourCategoryCustomTourRequests: {
           include: {
-            tourCategory: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -89,11 +94,16 @@ export class CustomTourRequestService {
 
   async findAll(): Promise<CustomTourRequestResponseDto[]> {
     const requests = await this.prismaService.customTourRequest.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { updatedAt: 'desc' },
       include: {
         tourCategoryCustomTourRequests: {
           include: {
-            tourCategory: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },
@@ -108,7 +118,12 @@ export class CustomTourRequestService {
       include: {
         tourCategoryCustomTourRequests: {
           include: {
-            tourCategory: true,
+            tourCategory: {
+              include: {
+                parent: true,
+                children: true,
+              },
+            },
           },
         },
       },

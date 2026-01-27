@@ -3,7 +3,7 @@ export class SectionUICredentialsResponseDto {
   code: string;
   componentKey: string;
   type: string;
-  propertyFormat: object;
+  propertyFormat: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
 }

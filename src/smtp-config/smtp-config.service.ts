@@ -14,6 +14,7 @@ export class SmtpConfigService {
   async get(userId: string): Promise<SmtpConfigResponseDto | null> {
     const config = await this.prismaService.smtpConfig.findFirst({
       where: { userId },
+      orderBy: { updatedAt: 'desc' },
     });
 
     if (!config) {
@@ -30,6 +31,7 @@ export class SmtpConfigService {
   async update(userId: string, dto: UpdateSmtpConfigRequestDto): Promise<SmtpConfigResponseDto> {
     let config = await this.prismaService.smtpConfig.findFirst({
       where: { userId },
+      orderBy: { updatedAt: 'desc' },
     });
 
     if (!config) {
@@ -55,6 +57,7 @@ export class SmtpConfigService {
   async testEmail(userId: string, email: string): Promise<boolean> {
     const config = await this.prismaService.smtpConfig.findFirst({
       where: { userId },
+      orderBy: { updatedAt: 'desc' },
     });
 
     if (!config) {

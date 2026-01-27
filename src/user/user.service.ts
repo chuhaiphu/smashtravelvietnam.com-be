@@ -110,8 +110,6 @@ export class UserService {
       email: user.email,
       name: user.name,
       role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
     };
   }
 }

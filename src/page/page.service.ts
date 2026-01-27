@@ -21,19 +21,12 @@ export class PageService {
       throw new ConflictException('Page with this endpoint already exists');
     }
 
+    const { userId: dtoUserId, ...pageData } = dto;
+
     const page = await this.prismaService.page.create({
       data: {
-        ...dto,
-        createdByUserId: userId,
-      },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        ...pageData,
+        createdByUserId: dtoUserId || userId || undefined,
       },
     });
 
@@ -42,16 +35,29 @@ export class PageService {
 
   async findAll(): Promise<PageResponseDto[]> {
     const pages = await this.prismaService.page.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+      orderBy: [{ updatedAt: 'desc' }],
+    });
+
+    return pages;
+  }
+
+  async findAllPublicPages(): Promise<PageResponseDto[]> {
+    const pages = await this.prismaService.page.findMany({
+      where: {
+        visibility: 'public',
       },
+      orderBy: [{ updatedAt: 'desc' }],
+    });
+
+    return pages;
+  }
+
+  async findPagesByUserId(userId: string): Promise<PageResponseDto[]> {
+    const pages = await this.prismaService.page.findMany({
+      where: {
+        createdByUserId: userId,
+      },
+      orderBy: [{ updatedAt: 'desc' }],
     });
 
     return pages;
@@ -60,15 +66,6 @@ export class PageService {
   async findById(id: string): Promise<PageResponseDto> {
     const page = await this.prismaService.page.findUnique({
       where: { id },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
     });
 
     if (!page) {
@@ -80,7 +77,7 @@ export class PageService {
 
   async findByEndpoint(endpoint: string) {
     const page = await this.prismaService.page.findUnique({
-      where: { endpoint, visibility: 'public' },
+      where: { endpoint },
     });
 
     if (!page) {
@@ -111,15 +108,6 @@ export class PageService {
     const updatedPage = await this.prismaService.page.update({
       where: { id },
       data: dto,
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
     });
 
     return updatedPage;

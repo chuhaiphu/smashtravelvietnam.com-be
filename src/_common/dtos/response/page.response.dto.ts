@@ -1,5 +1,3 @@
-import { User } from 'src/prisma/generated/client';
-
 export class PageResponseDto {
   id: string;
   title: string;
@@ -12,12 +10,10 @@ export class PageResponseDto {
   visibility: string;
   videoUrl: string | null;
   videoThumbnailUrl: string | null;
-  videoPosition: string;
+  videoPosition: string | null;
   mainImageUrl: string | null;
   additionalImageUrls: string[];
-  additionalImagesPosition: string;
-  createdByUserId: string | null;
+  additionalImagesPosition: string | null;
   createdAt: Date;
   updatedAt: Date;
-  createdBy?: Pick<User, 'id' | 'name' | 'email'> | null;
 }

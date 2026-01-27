@@ -15,5 +15,5 @@ export class BookingResponseDto {
   customerNotes: string | null;
   createdAt: Date;
   updatedAt: Date;
-  tour?: Tour;
+  tour: Tour;
 }

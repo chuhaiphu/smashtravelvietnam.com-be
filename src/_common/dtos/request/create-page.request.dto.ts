@@ -23,12 +23,15 @@ export class CreatePageRequestDto {
 
   @IsArray()
   @IsString({ each: true })
-  @IsOptional()
-  destinations?: string[];
+  destinations: string[];
 
   @IsString()
   @IsNotEmpty()
   endpoint: string;
+
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
 
   @IsString()
   @IsOptional()
