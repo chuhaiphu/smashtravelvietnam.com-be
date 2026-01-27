@@ -2,9 +2,9 @@ import { registerAs } from '@nestjs/config';
 import { CookieOptions } from 'express';
 import { ONE_DAY } from 'src/_common/constants/time.constant';
 import {
-  APP_DOMAIN_PRODUCTION,
-  FRONTEND_LOCAL,
-  FRONTEND_PRODUCTION,
+  CLIENT_URI_LOCAL,
+  CLIENT_URI_PRODUCTION,
+  CLIENT_DOMAIN_PRODUCTION,
 } from 'src/_common/constants/uri.constant';
 
 export interface AppConfig {
@@ -30,7 +30,7 @@ export default registerAs('app', (): AppConfig => {
   const isProduction = process.env.NODE_ENV === 'production';
   return {
     cors: {
-      origin: isProduction ? [FRONTEND_PRODUCTION] : [FRONTEND_LOCAL],
+      origin: isProduction ? [CLIENT_URI_PRODUCTION] : [CLIENT_URI_LOCAL],
     },
     cookies: {
       accessToken: {
@@ -39,7 +39,7 @@ export default registerAs('app', (): AppConfig => {
           httpOnly: true,
           secure: isProduction,
           sameSite: isProduction ? 'strict' : 'lax',
-          ...(isProduction ? { domain: APP_DOMAIN_PRODUCTION } : {}),
+          ...(isProduction ? { domain: CLIENT_DOMAIN_PRODUCTION } : {}),
           maxAge: ONE_DAY * 7,
         } as CookieOptions,
       },

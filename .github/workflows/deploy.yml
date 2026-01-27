@@ -48,7 +48,7 @@ jobs:
         key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
         port: 2222
         script: |
-          cd /opt/apps/thevietnamtravel.com
+          cd /opt/apps/smashtravelvietnam.com
 
           # Set environment variables directly in shell
           export DOCKER_IMAGE="${{ env.DOCKER_IMAGE }}"
