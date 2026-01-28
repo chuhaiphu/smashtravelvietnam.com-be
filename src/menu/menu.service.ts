@@ -10,8 +10,29 @@ export class MenuService {
   constructor(private prismaService: PrismaService) {}
 
   async create(dto: CreateMenuRequestDto): Promise<MenuResponseDto> {
+    // Get root menu as default parent
+    const rootMenu = await this.prismaService.menu.findFirst({
+      where: { isRoot: true },
+    });
+
+    if (!rootMenu) {
+      throw new NotFoundException('Root menu not found');
+    }
+
+    // Get next available sortOrder under root
+    const maxSortOrder = await this.getGreatestSortOrderValue(rootMenu.id);
+    const sortOrder = maxSortOrder + 1;
+
+    // Create menu
     const menu = await this.prismaService.menu.create({
-      data: dto,
+      data: {
+        title: dto.title,
+        customUrl: dto.customUrl,
+        parentId: rootMenu.id,
+        sortOrder,
+        targetType: 'custom', // default value
+        isRoot: false,
+      },
       include: {
         parent: true,
         children: {
@@ -332,9 +353,6 @@ export class MenuService {
   }
 
   async getGreatestSortOrderValue(parentId: string | null): Promise<number> {
-    if (!parentId) {
-      return -1;
-    }
     const result = await this.prismaService.menu.aggregate({
       where: { parentId },
       _max: {

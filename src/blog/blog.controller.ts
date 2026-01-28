@@ -39,18 +39,6 @@ export class BlogController {
     };
   }
 
-  @Get(':endpoint')
-  async findByEndpoint(
-    @Param('endpoint') endpoint: string
-  ): Promise<HttpResponse<BlogResponseDto>> {
-    const blog = await this.blogService.findByEndpoint(endpoint);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Blog retrieved successfully',
-      data: blog,
-    };
-  }
-
   @Post(':id/view')
   async incrementView(
     @Param('id') id: string,
@@ -138,6 +126,18 @@ export class BlogController {
     return {
       statusCode: HttpStatus.NO_CONTENT,
       message: 'Blog deleted successfully',
+    };
+  }
+
+  @Get(':endpoint')
+  async findByEndpoint(
+    @Param('endpoint') endpoint: string
+  ): Promise<HttpResponse<BlogResponseDto>> {
+    const blog = await this.blogService.findByEndpoint(endpoint);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Blog retrieved successfully',
+      data: blog,
     };
   }
 }

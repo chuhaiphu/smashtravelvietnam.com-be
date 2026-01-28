@@ -39,18 +39,6 @@ export class TourController {
     };
   }
 
-  @Get(':endpoint')
-  async findByEndpoint(
-    @Param('endpoint') endpoint: string
-  ): Promise<HttpResponse<TourResponseDto>> {
-    const tour = await this.tourService.findByEndpoint(endpoint);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Tour retrieved successfully',
-      data: tour,
-    };
-  }
-
   @Post(':id/view')
   async incrementView(
     @Param('id') id: string,
@@ -138,6 +126,18 @@ export class TourController {
     return {
       statusCode: HttpStatus.NO_CONTENT,
       message: 'Tour deleted successfully',
+    };
+  }
+
+  @Get(':endpoint')
+  async findByEndpoint(
+    @Param('endpoint') endpoint: string
+  ): Promise<HttpResponse<TourResponseDto>> {
+    const tour = await this.tourService.findByEndpoint(endpoint);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Tour retrieved successfully',
+      data: tour,
     };
   }
 }

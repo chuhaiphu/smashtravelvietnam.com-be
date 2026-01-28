@@ -10,7 +10,6 @@ import { Type } from 'class-transformer';
 
 export class CreateTourRequestDto {
   @IsString()
-  @IsNotEmpty()
   title: string;
 
   @IsString()

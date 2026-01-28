@@ -32,18 +32,6 @@ export class BlogCategoryController {
     };
   }
 
-  @Get(':endpoint')
-  async findByEndpoint(
-    @Param('endpoint') endpoint: string
-  ): Promise<HttpResponse<BlogCategoryResponseDto>> {
-    const category = await this.blogCategoryService.findByEndpoint(endpoint);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Blog category retrieved successfully',
-      data: category,
-    };
-  }
-
   // ==================== ADMIN ROUTES ====================
 
   @Post('admin')
@@ -115,6 +103,18 @@ export class BlogCategoryController {
     return {
       statusCode: HttpStatus.NO_CONTENT,
       message: 'Blog category deleted successfully',
+    };
+  }
+
+  @Get(':endpoint')
+  async findByEndpoint(
+    @Param('endpoint') endpoint: string
+  ): Promise<HttpResponse<BlogCategoryResponseDto>> {
+    const category = await this.blogCategoryService.findByEndpoint(endpoint);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Blog category retrieved successfully',
+      data: category,
     };
   }
 }

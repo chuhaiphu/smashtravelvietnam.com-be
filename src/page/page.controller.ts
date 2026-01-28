@@ -24,18 +24,6 @@ export class PageController {
 
   // ==================== PUBLIC ROUTES ====================
 
-  @Get(':endpoint')
-  async findByEndpoint(
-    @Param('endpoint') endpoint: string
-  ): Promise<HttpResponse<PageResponseDto>> {
-    const page = await this.pageService.findByEndpoint(endpoint);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Page retrieved successfully',
-      data: page,
-    };
-  }
-
   // ==================== ADMIN ROUTES ====================
 
   @Post('admin')
@@ -95,6 +83,18 @@ export class PageController {
     return {
       statusCode: HttpStatus.NO_CONTENT,
       message: 'Page deleted successfully',
+    };
+  }
+
+  @Get(':endpoint')
+  async findByEndpoint(
+    @Param('endpoint') endpoint: string
+  ): Promise<HttpResponse<PageResponseDto>> {
+    const page = await this.pageService.findByEndpoint(endpoint);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Page retrieved successfully',
+      data: page,
     };
   }
 }

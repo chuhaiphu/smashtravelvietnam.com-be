@@ -32,18 +32,6 @@ export class TourCategoryController {
     };
   }
 
-  @Get(':endpoint')
-  async findByEndpoint(
-    @Param('endpoint') endpoint: string
-  ): Promise<HttpResponse<TourCategoryResponseDto>> {
-    const category = await this.tourCategoryService.findByEndpoint(endpoint);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Tour category retrieved successfully',
-      data: category,
-    };
-  }
-
   // ==================== ADMIN ROUTES ====================
 
   @Post('admin')
@@ -115,6 +103,18 @@ export class TourCategoryController {
     return {
       statusCode: HttpStatus.NO_CONTENT,
       message: 'Tour category deleted successfully',
+    };
+  }
+
+  @Get(':endpoint')
+  async findByEndpoint(
+    @Param('endpoint') endpoint: string
+  ): Promise<HttpResponse<TourCategoryResponseDto>> {
+    const category = await this.tourCategoryService.findByEndpoint(endpoint);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Tour category retrieved successfully',
+      data: category,
     };
   }
 }

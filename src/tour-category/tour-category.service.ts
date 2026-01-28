@@ -14,6 +14,7 @@ export class TourCategoryService {
   constructor(private prismaService: PrismaService) {}
 
   async create(dto: CreateTourCategoryRequestDto): Promise<TourCategoryResponseDto> {
+    // Check if endpoint already exists
     const existing = await this.prismaService.tourCategory.findUnique({
       where: { endpoint: dto.endpoint },
     });
@@ -22,8 +23,28 @@ export class TourCategoryService {
       throw new ConflictException('Category with this endpoint already exists');
     }
 
+    // Get root category as default parent
+    const rootCategory = await this.prismaService.tourCategory.findUnique({
+      where: { endpoint: '__root__' },
+    });
+
+    if (!rootCategory) {
+      throw new NotFoundException('Root category not found');
+    }
+
+    // Get next available sortOrder under root
+    const maxSortOrder = await this.getGreatestSortOrderValue(rootCategory.id);
+    const sortOrder = maxSortOrder + 1;
+
+    // Create category
     const category = await this.prismaService.tourCategory.create({
-      data: dto,
+      data: {
+        title: dto.title,
+        endpoint: dto.endpoint,
+        parentId: rootCategory.id,
+        sortOrder,
+        videoPosition: 'bottom', // default value
+      },
       include: {
         parent: true,
         children: true,
@@ -363,9 +384,6 @@ export class TourCategoryService {
   }
 
   async getGreatestSortOrderValue(parentId: string | null): Promise<number> {
-    if (!parentId) {
-      return -1;
-    }
     const result = await this.prismaService.tourCategory.aggregate({
       where: { parentId },
       _max: {

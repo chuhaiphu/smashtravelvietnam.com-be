@@ -9,7 +9,6 @@ import { Type } from 'class-transformer';
 
 export class CreateBlogRequestDto {
   @IsString()
-  @IsNotEmpty()
   title: string;
 
   @IsString()
