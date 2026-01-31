@@ -32,6 +32,16 @@ export class MenuController {
     };
   }
 
+  @Get('list')
+  async findAllPublic(): Promise<HttpResponse<MenuResponseDto[]>> {
+    const menus = await this.menuService.findAll();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Menus retrieved successfully',
+      data: menus,
+    };
+  }
+
   // ==================== ADMIN ROUTES ====================
 
   @Post('admin')
