@@ -4,7 +4,7 @@ import { ONE_DAY } from 'src/_common/constants/time.constant';
 import {
   CLIENT_URL_LOCAL,
   CLIENT_URL_PRODUCTION,
-  CLIENT_DOMAIN_PRODUCTION,
+  // CLIENT_DOMAIN_PRODUCTION,
 } from 'src/_common/constants/uri.constant';
 
 export interface AppConfig {
@@ -28,9 +28,10 @@ export interface AppConfig {
 
 export default registerAs('app', (): AppConfig => {
   const isProduction = process.env.NODE_ENV === 'production';
+  const allowedOrigins = [CLIENT_URL_PRODUCTION, CLIENT_URL_LOCAL];
   return {
     cors: {
-      origin: isProduction ? [CLIENT_URL_PRODUCTION] : [CLIENT_URL_LOCAL],
+      origin: allowedOrigins,
     },
     cookies: {
       accessToken: {
@@ -38,8 +39,8 @@ export default registerAs('app', (): AppConfig => {
         options: {
           httpOnly: true,
           secure: isProduction,
-          sameSite: isProduction ? 'strict' : 'lax',
-          ...(isProduction ? { domain: CLIENT_DOMAIN_PRODUCTION } : {}),
+          sameSite: 'none',
+          // ...(isProduction ? { domain: CLIENT_DOMAIN_PRODUCTION } : {}),
           maxAge: ONE_DAY * 7,
         } as CookieOptions,
       },

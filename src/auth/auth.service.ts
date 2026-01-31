@@ -17,6 +17,7 @@ export class AuthService {
   ) {}
 
   async localSignIn(dto: LocalSignInRequestDto): Promise<AuthResponseDto> {
+
     const user = await this.prismaService.user.findUnique({
       where: { email: dto.email },
     });
