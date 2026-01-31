@@ -16,33 +16,14 @@ import { UpdateTourCategoryTourRequestDto } from 'src/_common/dtos/request/updat
 import { HttpResponse } from 'src/_common/interfaces/interface';
 import { TourCategoryTourResponseDto } from 'src/_common/dtos/response/tour-category-tour.response.dto';
 
-@Controller('admin/tour-category-tours')
-@UseGuards(JwtAuthGuard)
+@Controller('tour-category-tours')
 export class TourCategoryTourController {
   constructor(
     private readonly tourCategoryTourService: TourCategoryTourService,
   ) {}
 
-  /**
-   * POST /admin/tour-category-tours
-   * Create a new tour-category-tour relation
-   */
-  @Post()
-  async create(
-    @Body() dto: CreateTourCategoryTourRequestDto,
-  ): Promise<HttpResponse<TourCategoryTourResponseDto>> {
-    const relation = await this.tourCategoryTourService.create(dto);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'Tour-category-tour relation created successfully',
-      data: relation,
-    };
-  }
+  // ==================== PUBLIC ROUTES (GET, no guard) ====================
 
-  /**
-   * GET /admin/tour-category-tours
-   * Get all tour-category-tour relations
-   */
   @Get()
   async findAll(): Promise<HttpResponse<TourCategoryTourResponseDto[]>> {
     const relations = await this.tourCategoryTourService.findAll();
@@ -53,10 +34,6 @@ export class TourCategoryTourController {
     };
   }
 
-  /**
-   * GET /admin/tour-category-tours/tour/:tourId
-   * Get all tour-category-tour relations for a specific tour
-   */
   @Get('tour/:tourId')
   async findByTourId(
     @Param('tourId') tourId: string,
@@ -69,10 +46,6 @@ export class TourCategoryTourController {
     };
   }
 
-  /**
-   * GET /admin/tour-category-tours/category/:tourCategoryId
-   * Get all tour-category-tour relations for a specific tour category
-   */
   @Get('category/:tourCategoryId')
   async findByTourCategoryId(
     @Param('tourCategoryId') tourCategoryId: string,
@@ -86,10 +59,6 @@ export class TourCategoryTourController {
     };
   }
 
-  /**
-   * GET /admin/tour-category-tours/:id
-   * Get a tour-category-tour relation by ID
-   */
   @Get(':id')
   async findById(
     @Param('id') id: string,
@@ -102,11 +71,23 @@ export class TourCategoryTourController {
     };
   }
 
-  /**
-   * PUT /admin/tour-category-tours/:id
-   * Update a tour-category-tour relation
-   */
-  @Put(':id')
+  // ==================== ADMIN ROUTES (guard) ====================
+
+  @Post('admin')
+  @UseGuards(JwtAuthGuard)
+  async create(
+    @Body() dto: CreateTourCategoryTourRequestDto,
+  ): Promise<HttpResponse<TourCategoryTourResponseDto>> {
+    const relation = await this.tourCategoryTourService.create(dto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tour-category-tour relation created successfully',
+      data: relation,
+    };
+  }
+
+  @Put('admin/:id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateTourCategoryTourRequestDto,
@@ -119,11 +100,8 @@ export class TourCategoryTourController {
     };
   }
 
-  /**
-   * DELETE /admin/tour-category-tours/tour/:tourId
-   * Delete all tour-category-tour relations for a specific tour
-   */
-  @Delete('tour/:tourId')
+  @Delete('admin/tour/:tourId')
+  @UseGuards(JwtAuthGuard)
   async deleteByTourId(@Param('tourId') tourId: string): Promise<HttpResponse<void>> {
     await this.tourCategoryTourService.deleteByTourId(tourId);
     return {
@@ -132,11 +110,8 @@ export class TourCategoryTourController {
     };
   }
 
-  /**
-   * DELETE /admin/tour-category-tours/category/:tourCategoryId
-   * Delete all tour-category-tour relations for a specific tour category
-   */
-  @Delete('category/:tourCategoryId')
+  @Delete('admin/category/:tourCategoryId')
+  @UseGuards(JwtAuthGuard)
   async deleteByTourCategoryId(
     @Param('tourCategoryId') tourCategoryId: string,
   ): Promise<HttpResponse<void>> {
@@ -147,11 +122,8 @@ export class TourCategoryTourController {
     };
   }
 
-  /**
-   * DELETE /admin/tour-category-tours/:id
-   * Delete a tour-category-tour relation by ID
-   */
-  @Delete(':id')
+  @Delete('admin/:id')
+  @UseGuards(JwtAuthGuard)
   async delete(@Param('id') id: string): Promise<HttpResponse<void>> {
     await this.tourCategoryTourService.delete(id);
     return {

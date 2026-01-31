@@ -16,33 +16,14 @@ import { UpdateBlogCategoryBlogRequestDto } from 'src/_common/dtos/request/updat
 import { HttpResponse } from 'src/_common/interfaces/interface';
 import { BlogCategoryBlogResponseDto } from 'src/_common/dtos/response/blog-category-blog.response.dto';
 
-@Controller('admin/blog-category-blogs')
-@UseGuards(JwtAuthGuard)
+@Controller('blog-category-blogs')
 export class BlogCategoryBlogController {
   constructor(
     private readonly blogCategoryBlogService: BlogCategoryBlogService,
   ) {}
 
-  /**
-   * POST /admin/blog-category-blogs
-   * Create a new blog-category-blog relation
-   */
-  @Post()
-  async create(
-    @Body() dto: CreateBlogCategoryBlogRequestDto,
-  ): Promise<HttpResponse<BlogCategoryBlogResponseDto>> {
-    const relation = await this.blogCategoryBlogService.create(dto);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'Blog-category-blog relation created successfully',
-      data: relation,
-    };
-  }
+  // ==================== PUBLIC ROUTES (GET, no guard) ====================
 
-  /**
-   * GET /admin/blog-category-blogs
-   * Get all blog-category-blog relations
-   */
   @Get()
   async findAll(): Promise<HttpResponse<BlogCategoryBlogResponseDto[]>> {
     const relations = await this.blogCategoryBlogService.findAll();
@@ -53,10 +34,6 @@ export class BlogCategoryBlogController {
     };
   }
 
-  /**
-   * GET /admin/blog-category-blogs/blog/:blogId
-   * Get all blog-category-blog relations for a specific blog
-   */
   @Get('blog/:blogId')
   async findByBlogId(
     @Param('blogId') blogId: string,
@@ -69,10 +46,6 @@ export class BlogCategoryBlogController {
     };
   }
 
-  /**
-   * GET /admin/blog-category-blogs/category/:blogCategoryId
-   * Get all blog-category-blog relations for a specific blog category
-   */
   @Get('category/:blogCategoryId')
   async findByBlogCategoryId(
     @Param('blogCategoryId') blogCategoryId: string,
@@ -86,10 +59,6 @@ export class BlogCategoryBlogController {
     };
   }
 
-  /**
-   * GET /admin/blog-category-blogs/:id
-   * Get a blog-category-blog relation by ID
-   */
   @Get(':id')
   async findById(
     @Param('id') id: string,
@@ -102,11 +71,23 @@ export class BlogCategoryBlogController {
     };
   }
 
-  /**
-   * PUT /admin/blog-category-blogs/:id
-   * Update a blog-category-blog relation
-   */
-  @Put(':id')
+  // ==================== ADMIN ROUTES (guard) ====================
+
+  @Post('admin')
+  @UseGuards(JwtAuthGuard)
+  async create(
+    @Body() dto: CreateBlogCategoryBlogRequestDto,
+  ): Promise<HttpResponse<BlogCategoryBlogResponseDto>> {
+    const relation = await this.blogCategoryBlogService.create(dto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Blog-category-blog relation created successfully',
+      data: relation,
+    };
+  }
+
+  @Put('admin/:id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateBlogCategoryBlogRequestDto,
@@ -119,11 +100,8 @@ export class BlogCategoryBlogController {
     };
   }
 
-  /**
-   * DELETE /admin/blog-category-blogs/blog/:blogId
-   * Delete all blog-category-blog relations for a specific blog
-   */
-  @Delete('blog/:blogId')
+  @Delete('admin/blog/:blogId')
+  @UseGuards(JwtAuthGuard)
   async deleteByBlogId(@Param('blogId') blogId: string): Promise<HttpResponse<void>> {
     await this.blogCategoryBlogService.deleteByBlogId(blogId);
     return {
@@ -132,11 +110,8 @@ export class BlogCategoryBlogController {
     };
   }
 
-  /**
-   * DELETE /admin/blog-category-blogs/category/:blogCategoryId
-   * Delete all blog-category-blog relations for a specific blog category
-   */
-  @Delete('category/:blogCategoryId')
+  @Delete('admin/category/:blogCategoryId')
+  @UseGuards(JwtAuthGuard)
   async deleteByBlogCategoryId(
     @Param('blogCategoryId') blogCategoryId: string,
   ): Promise<HttpResponse<void>> {
@@ -147,11 +122,8 @@ export class BlogCategoryBlogController {
     };
   }
 
-  /**
-   * DELETE /admin/blog-category-blogs/:id
-   * Delete a blog-category-blog relation by ID
-   */
-  @Delete(':id')
+  @Delete('admin/:id')
+  @UseGuards(JwtAuthGuard)
   async delete(@Param('id') id: string): Promise<HttpResponse<void>> {
     await this.blogCategoryBlogService.delete(id);
     return {
