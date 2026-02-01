@@ -123,6 +123,7 @@ export class BlogService {
         { updatedAt: 'desc' },
       ],
       include: {
+        createdBy: true,
         blogCategoryBlogs: {
           include: {
             blogCategory: {
@@ -152,6 +153,7 @@ export class BlogService {
         { updatedAt: 'desc' },
       ],
       include: {
+        createdBy: true,
         blogCategoryBlogs: {
           include: {
             blogCategory: {
@@ -177,6 +179,7 @@ export class BlogService {
         { updatedAt: 'desc' },
       ],
       include: {
+        createdBy: true,
         blogCategoryBlogs: {
           include: {
             blogCategory: {
@@ -230,6 +233,7 @@ export class BlogService {
     const blog = await this.prismaService.blog.findUnique({
       where: { id },
       include: {
+        createdBy: true,
         blogCategoryBlogs: {
           include: {
             blogCategory: {
@@ -254,6 +258,7 @@ export class BlogService {
     const blog = await this.prismaService.blog.findUnique({
       where: { endpoint, visibility: 'public' },
       include: {
+        createdBy: true,
         blogCategoryBlogs: {
           include: {
             blogCategory: {
@@ -314,6 +319,7 @@ export class BlogService {
       where: { id },
       data: blogData,
       include: {
+        createdBy: true,
         blogCategoryBlogs: {
           include: {
             blogCategory: {
