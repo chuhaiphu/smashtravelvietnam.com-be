@@ -82,6 +82,7 @@ export class TourService {
         { sortOrder: 'asc' },
       ],
       include: {
+        createdBy: true,
         tourCategoryTours: {
           include: {
             tourCategory: {
@@ -123,6 +124,7 @@ export class TourService {
         { updatedAt: 'desc' },
       ],
       include: {
+        createdBy: true,
         tourCategoryTours: {
           include: {
             tourCategory: {
@@ -152,6 +154,7 @@ export class TourService {
         { updatedAt: 'desc' },
       ],
       include: {
+        createdBy: true,
         tourCategoryTours: {
           include: {
             tourCategory: {
@@ -177,6 +180,7 @@ export class TourService {
         { updatedAt: 'desc' },
       ],
       include: {
+        createdBy: true,
         tourCategoryTours: {
           include: {
             tourCategory: {
@@ -230,6 +234,7 @@ export class TourService {
     const tour = await this.prismaService.tour.findUnique({
       where: { id },
       include: {
+        createdBy: true,
         tourCategoryTours: {
           include: {
             tourCategory: {
@@ -254,6 +259,7 @@ export class TourService {
     const tour = await this.prismaService.tour.findUnique({
       where: { endpoint, visibility: 'public' },
       include: {
+        createdBy: true,
         tourCategoryTours: {
           include: {
             tourCategory: {
