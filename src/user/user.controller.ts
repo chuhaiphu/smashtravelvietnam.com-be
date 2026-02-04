@@ -19,7 +19,7 @@ import { UserResponseDto } from 'src/_common/dtos/response/user.response.dto';
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   async create(

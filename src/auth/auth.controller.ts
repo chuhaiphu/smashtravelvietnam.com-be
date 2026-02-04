@@ -4,13 +4,14 @@ import {
   Get,
   HttpStatus,
   Inject,
+  Param,
   Post,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import type { Response } from 'express';
-import appConfig from 'src/_core/configs/app.config';
+import authConfig from 'src/_core/configs/auth.config';
 import { AuthService } from './auth.service';
 import { LocalSignInRequestDto } from 'src/_common/dtos/request/local-signin.request.dto';
 import type { HttpResponse } from 'src/_common/interfaces/interface';
@@ -23,9 +24,9 @@ import { JwtValidationReturn } from 'src/_common/interfaces/interface';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    @Inject(appConfig.KEY)
-    private readonly appConf: ConfigType<typeof appConfig>
-  ) {}
+    @Inject(authConfig.KEY)
+    private readonly authConf: ConfigType<typeof authConfig>
+  ) { }
 
   @Post('local')
   async localSignIn(
@@ -35,9 +36,9 @@ export class AuthController {
     const authResult = await this.authService.localSignIn(dto);
 
     response.cookie(
-      this.appConf.cookies.accessToken.name,
+      this.authConf.cookies.accessToken.name,
       authResult.accessToken,
-      this.appConf.cookies.accessToken.options
+      this.authConf.cookies.accessToken.options
     );
 
     return {
@@ -50,8 +51,8 @@ export class AuthController {
   @Post('logout')
   logout(@Res({ passthrough: true }) response: Response): HttpResponse<void> {
     response.clearCookie(
-      this.appConf.cookies.accessToken.name,
-      this.appConf.cookies.accessToken.options
+      this.authConf.cookies.accessToken.name,
+      this.authConf.cookies.accessToken.options
     );
 
     return {
@@ -71,6 +72,33 @@ export class AuthController {
       statusCode: HttpStatus.OK,
       message: 'User data retrieved successfully',
       data: userData,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('reset-password')
+  async resetPassword(
+    @CurrentUser() user: JwtValidationReturn
+  ): Promise<HttpResponse<void>> {
+    await this.authService.resetPassword(user.userId);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Password has been reset successfully',
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('reset-password/:userId')
+  async resetPasswordForUser(
+    @CurrentUser() user: JwtValidationReturn,
+    @Param('userId') targetUserId: string
+  ): Promise<HttpResponse<void>> {
+    await this.authService.resetPasswordForUser(user.userId, targetUserId);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'User password has been reset successfully',
     };
   }
 }

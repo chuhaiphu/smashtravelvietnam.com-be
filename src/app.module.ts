@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import appConfig from './_core/configs/app.config';
+import appConfig from './_core/configs/auth.config';
 import { AuthModule } from './auth/auth.module';
 import { AuthExceptionFilter } from './_core/filters/auth-exception.filter';
 import { AppExceptionFilter } from './_core/filters/app-exception.filter';
@@ -64,4 +64,4 @@ import { SectionUIModule } from './section-ui/section-ui.module';
   controllers: [AppController],
   providers: [AppService, AuthExceptionFilter, AppExceptionFilter],
 })
-export class AppModule {}
+export class AppModule { }

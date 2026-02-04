@@ -2,15 +2,15 @@ import { TokenInvalidException } from 'src/_common/exceptions/auth.exception';
 import { Catch, ExceptionFilter, ArgumentsHost, Inject } from '@nestjs/common';
 import { UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
-import appConfig from '../configs/app.config';
 import type { ConfigType } from '@nestjs/config';
+import authConfig from '../configs/auth.config';
 
 @Catch(TokenInvalidException, UnauthorizedException)
 export class AuthExceptionFilter implements ExceptionFilter {
   constructor(
-    @Inject(appConfig.KEY)
-    private readonly appConf: ConfigType<typeof appConfig>
-  ) {}
+    @Inject(authConfig.KEY)
+    private readonly authConf: ConfigType<typeof authConfig>
+  ) { }
 
   catch(
     exception: TokenInvalidException | UnauthorizedException,
@@ -18,8 +18,8 @@ export class AuthExceptionFilter implements ExceptionFilter {
   ) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    response.clearCookie(this.appConf.cookies.accessToken.name, {
-      ...this.appConf.cookies.accessToken.options,
+    response.clearCookie(this.authConf.cookies.accessToken.name, {
+      ...this.authConf.cookies.accessToken.options,
     });
     response.status(exception.getStatus()).json({
       statusCode: exception.getStatus(),

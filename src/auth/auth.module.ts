@@ -12,4 +12,4 @@ import { AuthController } from './auth.controller';
   providers: [AuthService, JwtStrategy],
   exports: [PassportModule, JwtModule],
 })
-export class AuthModule {}
+export class AuthModule { }

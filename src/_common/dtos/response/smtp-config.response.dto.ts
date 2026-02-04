@@ -1,5 +1,3 @@
-import { User } from 'src/prisma/generated/client';
-
 export class SmtpConfigResponseDto {
   id: string;
   host: string;
@@ -11,6 +9,4 @@ export class SmtpConfigResponseDto {
   fromEmail: string;
   receiveEmail: string | null;
   updatedAt: Date;
-  userId: string;
-  user?: User;
 }

@@ -3,4 +3,5 @@ export class UserResponseDto {
   email: string;
   name: string | null;
   role: string;
+  createdAt: Date;
 }

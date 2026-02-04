@@ -7,7 +7,7 @@ import {
   // CLIENT_DOMAIN_PRODUCTION,
 } from 'src/_common/constants/uri.constant';
 
-export interface AppConfig {
+export interface AuthConfig {
   cors: {
     origin: string[];
   };
@@ -21,14 +21,20 @@ export interface AppConfig {
     secret: string;
     expiresIn: number;
   };
+  defaultValue: {
+    supAdminEmail: string;
+    supAdminPassword: string;
+    defaultPassword?: string;
+  };
   recaptcha: {
     secretKey: string;
-  }
+  };
 }
 
-export default registerAs('app', (): AppConfig => {
-  const isProduction = process.env.NODE_ENV === 'production';
+export default registerAs('auth', (): AuthConfig => {
   const allowedOrigins = [CLIENT_URL_PRODUCTION, CLIENT_URL_LOCAL];
+  const supAdminEmail = process.env.SUPADMIN_EMAIL;
+  const supAdminPassword = process.env.SUPADMIN_PASSWORD;
   return {
     cors: {
       origin: allowedOrigins,
@@ -38,7 +44,7 @@ export default registerAs('app', (): AppConfig => {
         name: 'atk',
         options: {
           httpOnly: true,
-          secure: isProduction,
+          secure: true,
           sameSite: 'none',
           // ...(isProduction ? { domain: CLIENT_DOMAIN_PRODUCTION } : {}),
           maxAge: ONE_DAY * 7,
@@ -48,6 +54,11 @@ export default registerAs('app', (): AppConfig => {
     jwt: {
       secret: process.env.JWT_SECRET!,
       expiresIn: ONE_DAY * 7,
+    },
+    defaultValue: {
+      supAdminEmail: supAdminEmail!,
+      supAdminPassword: supAdminPassword!,
+      defaultPassword: 'SmashTravelVietnam@2026',
     },
     recaptcha: {
       secretKey: process.env.RECAPTCHA_SECRET_KEY!,

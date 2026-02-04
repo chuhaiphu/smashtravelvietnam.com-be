@@ -12,20 +12,16 @@ import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
 import { UpdateSmtpConfigRequestDto } from 'src/_common/dtos/request/update-smtp-config.request.dto';
 import { TestSmtpRequestDto } from 'src/_common/dtos/request/test-smtp.request.dto';
 import { HttpResponse } from 'src/_common/interfaces/interface';
-import { CurrentUser } from 'src/_core/decorators/current-user.decorator';
-import { JwtValidationReturn } from 'src/_common/interfaces/interface';
 import { SmtpConfigResponseDto } from 'src/_common/dtos/response/smtp-config.response.dto';
 
 @Controller('admin/smtp-config')
 @UseGuards(JwtAuthGuard)
 export class SmtpConfigController {
-  constructor(private readonly smtpConfigService: SmtpConfigService) {}
+  constructor(private readonly smtpConfigService: SmtpConfigService) { }
 
   @Get()
-  async get(
-    @CurrentUser() user: JwtValidationReturn
-  ): Promise<HttpResponse<SmtpConfigResponseDto | null>> {
-    const config = await this.smtpConfigService.get(user.userId);
+  async get(): Promise<HttpResponse<SmtpConfigResponseDto | null>> {
+    const config = await this.smtpConfigService.get();
     return {
       statusCode: HttpStatus.OK,
       message: 'SMTP config retrieved successfully',
@@ -35,10 +31,9 @@ export class SmtpConfigController {
 
   @Put()
   async update(
-    @CurrentUser() user: JwtValidationReturn,
     @Body() dto: UpdateSmtpConfigRequestDto
   ): Promise<HttpResponse<SmtpConfigResponseDto>> {
-    const config = await this.smtpConfigService.update(user.userId, dto);
+    const config = await this.smtpConfigService.update(dto);
     return {
       statusCode: HttpStatus.OK,
       message: 'SMTP config updated successfully',
@@ -48,13 +43,9 @@ export class SmtpConfigController {
 
   @Post('test')
   async testEmail(
-    @CurrentUser() user: JwtValidationReturn,
     @Body() dto: TestSmtpRequestDto
   ): Promise<HttpResponse<{ success: boolean }>> {
-    const success = await this.smtpConfigService.testEmail(
-      user.userId,
-      dto.email
-    );
+    const success = await this.smtpConfigService.testEmail(dto.email);
     return {
       statusCode: HttpStatus.OK,
       message: success ? 'Test email sent successfully' : 'Failed to send test email',

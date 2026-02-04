@@ -3,7 +3,7 @@ import { ConfigType } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
 import { CreateCustomTourRequestRequestDto } from 'src/_common/dtos/request/create-custom-tour-request.request.dto';
-import appConfig from 'src/_core/configs/app.config';
+import authConfig from 'src/_core/configs/auth.config';
 import { CustomTourRequestResponseDto } from 'src/_common/dtos/response/custom-tour-request.response.dto';
 
 @Injectable()
@@ -11,12 +11,12 @@ export class CustomTourRequestService {
   constructor(
     private prismaService: PrismaService,
     private mailService: MailService,
-    @Inject(appConfig.KEY)
-    private readonly appConf: ConfigType<typeof appConfig>
+    @Inject(authConfig.KEY)
+    private readonly authConf: ConfigType<typeof authConfig>
   ) { }
 
   private async verifyRecaptcha(token: string): Promise<boolean> {
-    if (!this.appConf.recaptcha.secretKey) {
+    if (!this.authConf.recaptcha.secretKey) {
       return true;
     }
 
@@ -28,7 +28,7 @@ export class CustomTourRequestService {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: `secret=${this.appConf.recaptcha.secretKey}&response=${token}`,
+          body: `secret=${this.authConf.recaptcha.secretKey}&response=${token}`,
         }
       );
 

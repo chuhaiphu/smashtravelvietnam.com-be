@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
-import { AppConfig } from './_core/configs/app.config';
+import { AuthConfig } from './_core/configs/auth.config';
 import { ConfigService } from '@nestjs/config';
 import { AppExceptionFilter } from './_core/filters/app-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
@@ -12,7 +12,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
-  const appConfig = configService.get<AppConfig>('app');
+  const appConfig = configService.get<AuthConfig>('auth');
 
   app.enableCors({
     origin: appConfig?.cors.origin,

@@ -10,7 +10,7 @@ import { MailService } from 'src/mail/mail.service';
 import { CreateBookingRequestDto } from 'src/_common/dtos/request/create-booking.request.dto';
 import { UpdateBookingRequestDto } from 'src/_common/dtos/request/update-booking.request.dto';
 import { BookingFilterParamDto } from 'src/_common/dtos/param/booking-filter.param.dto';
-import appConfig from 'src/_core/configs/app.config';
+import authConfig from 'src/_core/configs/auth.config';
 import { BookingResponseDto } from 'src/_common/dtos/response/booking.response.dto';
 import { Prisma } from 'src/prisma/generated/client';
 
@@ -19,12 +19,12 @@ export class BookingService {
   constructor(
     private prismaService: PrismaService,
     private mailService: MailService,
-    @Inject(appConfig.KEY)
-    private readonly appConf: ConfigType<typeof appConfig>
-  ) {}
+    @Inject(authConfig.KEY)
+    private readonly authConf: ConfigType<typeof authConfig>
+  ) { }
 
   private async verifyRecaptcha(token: string): Promise<boolean> {
-    if (!this.appConf.recaptcha.secretKey) {
+    if (!this.authConf.recaptcha.secretKey) {
       return true; // Skip verification if not configured
     }
 
@@ -36,7 +36,7 @@ export class BookingService {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: `secret=${this.appConf.recaptcha.secretKey}&response=${token}`,
+          body: `secret=${this.authConf.recaptcha.secretKey}&response=${token}`,
         }
       );
 
