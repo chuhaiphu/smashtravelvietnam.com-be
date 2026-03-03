@@ -282,7 +282,6 @@ model SectionUICredentials {
   id                String             @id @default(uuid())
   code              String             @unique
   componentKey      String
-  type              String
   propertyFormat    Json
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @default(now()) @updatedAt

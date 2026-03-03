@@ -47,10 +47,10 @@ export class SectionUIController {
 
   @Get('sections/position/:position')
   async findSectionByPosition(
-    @Param('position') position: string,
+    @Param('position') position: string
   ): Promise<HttpResponse<DynamicSectionUIResponseDto>> {
     const section = await this.sectionUIService.findSectionUIByPosition(
-      parseInt(position, 10),
+      parseInt(position, 10)
     );
     return {
       statusCode: HttpStatus.OK,
@@ -59,21 +59,9 @@ export class SectionUIController {
     };
   }
 
-  @Get('sections/type/:type')
-  async findSectionsByType(
-    @Param('type') type: string,
-  ): Promise<HttpResponse<DynamicSectionUIResponseDto[]>> {
-    const sections = await this.sectionUIService.findSectionUIsByType(type);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Dynamic Section UIs retrieved successfully',
-      data: sections,
-    };
-  }
-
   @Get('sections/:id')
   async findSectionById(
-    @Param('id') id: string,
+    @Param('id') id: string
   ): Promise<HttpResponse<DynamicSectionUIResponseDto>> {
     const section = await this.sectionUIService.findSectionUIById(id);
     return {
@@ -88,7 +76,7 @@ export class SectionUIController {
   @Post('admin/credentials')
   @UseGuards(JwtAuthGuard)
   async createCredential(
-    @Body() dto: CreateSectionUICredentialsRequestDto,
+    @Body() dto: CreateSectionUICredentialsRequestDto
   ): Promise<HttpResponse<SectionUICredentialsResponseDto>> {
     const credential = await this.sectionUIService.createSectionUICredentials(dto);
     return {
@@ -111,23 +99,13 @@ export class SectionUIController {
     };
   }
 
-  @Get('admin/credentials/types/distinct')
-  @UseGuards(JwtAuthGuard)
-  async getDistinctTypes(): Promise<HttpResponse<string[]>> {
-    const types = await this.sectionUIService.getDistinctSectionUICredentialsTypes();
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Distinct types retrieved successfully',
-      data: types,
-    };
-  }
-
   @Get('admin/credentials/code/:code')
   @UseGuards(JwtAuthGuard)
   async findCredentialByCode(
-    @Param('code') code: string,
+    @Param('code') code: string
   ): Promise<HttpResponse<SectionUICredentialsResponseDto>> {
-    const credential = await this.sectionUIService.findSectionUICredentialsByCode(code);
+    const credential =
+      await this.sectionUIService.findSectionUICredentialsByCode(code);
     return {
       statusCode: HttpStatus.OK,
       message: 'Section UI Credential retrieved successfully',
@@ -135,23 +113,10 @@ export class SectionUIController {
     };
   }
 
-  @Get('admin/credentials/type/:type')
-  @UseGuards(JwtAuthGuard)
-  async findCredentialsByType(
-    @Param('type') type: string,
-  ): Promise<HttpResponse<SectionUICredentialsResponseDto[]>> {
-    const credentials = await this.sectionUIService.findSectionUICredentialsByType(type);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Section UI Credentials retrieved successfully',
-      data: credentials,
-    };
-  }
-
   @Get('admin/credentials/:id')
   @UseGuards(JwtAuthGuard)
   async findCredentialById(
-    @Param('id') id: string,
+    @Param('id') id: string
   ): Promise<HttpResponse<SectionUICredentialsResponseDto>> {
     const credential = await this.sectionUIService.findSectionUICredentialsById(id);
     return {
@@ -165,9 +130,12 @@ export class SectionUIController {
   @UseGuards(JwtAuthGuard)
   async updateCredential(
     @Param('id') id: string,
-    @Body() dto: UpdateSectionUICredentialsRequestDto,
+    @Body() dto: UpdateSectionUICredentialsRequestDto
   ): Promise<HttpResponse<SectionUICredentialsResponseDto>> {
-    const credential = await this.sectionUIService.updateSectionUICredentials(id, dto);
+    const credential = await this.sectionUIService.updateSectionUICredentials(
+      id,
+      dto
+    );
     return {
       statusCode: HttpStatus.OK,
       message: 'Section UI Credential updated successfully',
@@ -177,9 +145,7 @@ export class SectionUIController {
 
   @Delete('admin/credentials/:id')
   @UseGuards(JwtAuthGuard)
-  async deleteCredential(
-    @Param('id') id: string,
-  ): Promise<HttpResponse<void>> {
+  async deleteCredential(@Param('id') id: string): Promise<HttpResponse<void>> {
     await this.sectionUIService.deleteSectionUICredentials(id);
     return {
       statusCode: HttpStatus.NO_CONTENT,
@@ -192,7 +158,7 @@ export class SectionUIController {
   @Post('admin/sections')
   @UseGuards(JwtAuthGuard)
   async createSection(
-    @Body() dto: CreateDynamicSectionUIRequestDto,
+    @Body() dto: CreateDynamicSectionUIRequestDto
   ): Promise<HttpResponse<DynamicSectionUIResponseDto>> {
     const section = await this.sectionUIService.createSectionUI(dto);
     return {
@@ -206,7 +172,7 @@ export class SectionUIController {
   @UseGuards(JwtAuthGuard)
   async updateSection(
     @Param('id') id: string,
-    @Body() dto: UpdateDynamicSectionUIRequestDto,
+    @Body() dto: UpdateDynamicSectionUIRequestDto
   ): Promise<HttpResponse<DynamicSectionUIResponseDto>> {
     const section = await this.sectionUIService.updateSectionUI(id, dto);
     return {

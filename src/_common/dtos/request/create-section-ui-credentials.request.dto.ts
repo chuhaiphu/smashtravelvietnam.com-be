@@ -9,10 +9,6 @@ export class CreateSectionUICredentialsRequestDto {
   @IsNotEmpty()
   componentKey: string;
 
-  @IsString()
-  @IsNotEmpty()
-  type: string;
-
   @IsObject()
   @IsNotEmpty()
   propertyFormat: object;

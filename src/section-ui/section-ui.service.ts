@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from 'src/prisma/generated/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSectionUICredentialsRequestDto } from 'src/_common/dtos/request/create-section-ui-credentials.request.dto';
@@ -18,32 +14,32 @@ export class SectionUIService {
 
   // ==================== Helper Methods ====================
 
-  private transformSectionResponse(
-    section: {
+  private transformSectionResponse(section: {
+    id: string;
+    position: number;
+    sectionUICredentialsId: string | null;
+    properties: Prisma.JsonValue;
+    createdAt: Date;
+    updatedAt: Date;
+    sectionUICredentials: {
       id: string;
-      position: number;
-      sectionUICredentialsId: string | null;
-      properties: Prisma.JsonValue;
+      code: string;
+      componentKey: string;
+      propertyFormat: Prisma.JsonValue;
       createdAt: Date;
       updatedAt: Date;
-      sectionUICredentials: {
-        id: string;
-        code: string;
-        componentKey: string;
-        type: string;
-        propertyFormat: Prisma.JsonValue;
-        createdAt: Date;
-        updatedAt: Date;
-      } | null;
-    },
-  ): DynamicSectionUIResponseDto {
+    } | null;
+  }): DynamicSectionUIResponseDto {
     return {
       ...section,
       properties: section.properties as Record<string, unknown> | null,
       sectionUICredentials: section.sectionUICredentials
         ? {
             ...section.sectionUICredentials,
-            propertyFormat: section.sectionUICredentials.propertyFormat as Record<string, unknown>,
+            propertyFormat: section.sectionUICredentials.propertyFormat as Record<
+              string,
+              unknown
+            >,
           }
         : null,
     };
@@ -52,7 +48,7 @@ export class SectionUIService {
   // ==================== SectionUICredentials Methods ====================
 
   async createSectionUICredentials(
-    dto: CreateSectionUICredentialsRequestDto,
+    dto: CreateSectionUICredentialsRequestDto
   ): Promise<SectionUICredentialsResponseDto> {
     // Check for duplicate code
     const existing = await this.prismaService.sectionUICredentials.findUnique({
@@ -61,7 +57,7 @@ export class SectionUIService {
 
     if (existing) {
       throw new ConflictException(
-        'Section UI Credential with this code already exists',
+        'Section UI Credential with this code already exists'
       );
     }
 
@@ -87,7 +83,7 @@ export class SectionUIService {
   }
 
   async findSectionUICredentialsById(
-    id: string,
+    id: string
   ): Promise<SectionUICredentialsResponseDto> {
     const credential = await this.prismaService.sectionUICredentials.findUnique({
       where: { id },
@@ -104,7 +100,7 @@ export class SectionUIService {
   }
 
   async findSectionUICredentialsByCode(
-    code: string,
+    code: string
   ): Promise<SectionUICredentialsResponseDto> {
     const credential = await this.prismaService.sectionUICredentials.findUnique({
       where: { code },
@@ -120,33 +116,9 @@ export class SectionUIService {
     };
   }
 
-  async findSectionUICredentialsByType(
-    type: string,
-  ): Promise<SectionUICredentialsResponseDto[]> {
-    const credentials = await this.prismaService.sectionUICredentials.findMany({
-      where: { type },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return credentials.map((credential) => ({
-      ...credential,
-      propertyFormat: credential.propertyFormat as Record<string, unknown>,
-    }));
-  }
-
-  async getDistinctSectionUICredentialsTypes(): Promise<string[]> {
-    const result = await this.prismaService.sectionUICredentials.findMany({
-      select: { type: true },
-      distinct: ['type'],
-      orderBy: { type: 'asc' },
-    });
-
-    return result.map((item) => item.type);
-  }
-
   async updateSectionUICredentials(
     id: string,
-    dto: UpdateSectionUICredentialsRequestDto,
+    dto: UpdateSectionUICredentialsRequestDto
   ): Promise<SectionUICredentialsResponseDto> {
     // Check if credential exists
     const credential = await this.prismaService.sectionUICredentials.findUnique({
@@ -165,7 +137,7 @@ export class SectionUIService {
 
       if (existing) {
         throw new ConflictException(
-          'Section UI Credential with this code already exists',
+          'Section UI Credential with this code already exists'
         );
       }
     }
@@ -198,7 +170,7 @@ export class SectionUIService {
   // ==================== DynamicSectionUI Methods ====================
 
   async createSectionUI(
-    dto: CreateDynamicSectionUIRequestDto,
+    dto: CreateDynamicSectionUIRequestDto
   ): Promise<DynamicSectionUIResponseDto> {
     // Check for duplicate position
     const existing = await this.prismaService.dynamicSectionUI.findUnique({
@@ -207,7 +179,7 @@ export class SectionUIService {
 
     if (existing) {
       throw new ConflictException(
-        'Dynamic Section UI with this position already exists',
+        'Dynamic Section UI with this position already exists'
       );
     }
 
@@ -259,7 +231,7 @@ export class SectionUIService {
   }
 
   async findSectionUIByPosition(
-    position: number,
+    position: number
   ): Promise<DynamicSectionUIResponseDto> {
     const section = await this.prismaService.dynamicSectionUI.findUnique({
       where: { position },
@@ -275,24 +247,6 @@ export class SectionUIService {
     return this.transformSectionResponse(section);
   }
 
-  async findSectionUIsByType(
-    type: string,
-  ): Promise<DynamicSectionUIResponseDto[]> {
-    const sections = await this.prismaService.dynamicSectionUI.findMany({
-      where: {
-        sectionUICredentials: {
-          type: type,
-        },
-      },
-      orderBy: { position: 'asc' },
-      include: {
-        sectionUICredentials: true,
-      },
-    });
-
-    return sections.map((section) => this.transformSectionResponse(section));
-  }
-
   async getUsedSectionUIPositions(): Promise<number[]> {
     const result = await this.prismaService.dynamicSectionUI.findMany({
       select: { position: true },
@@ -304,7 +258,7 @@ export class SectionUIService {
 
   async updateSectionUI(
     id: string,
-    dto: UpdateDynamicSectionUIRequestDto,
+    dto: UpdateDynamicSectionUIRequestDto
   ): Promise<DynamicSectionUIResponseDto> {
     // Check if section exists
     const section = await this.prismaService.dynamicSectionUI.findUnique({
@@ -323,7 +277,7 @@ export class SectionUIService {
 
       if (existing) {
         throw new ConflictException(
-          'Dynamic Section UI with this position already exists',
+          'Dynamic Section UI with this position already exists'
         );
       }
     }

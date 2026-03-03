@@ -3,28 +3,22 @@
 // It should be kept in sync with the frontend section-ui registry
 
 export const SECTION_KEYS = {
-  LANDING_CAROUSEL_V1: "LANDING_CAROUSEL_V1",
+  LANDING_CAROUSEL_V1: 'LANDING_CAROUSEL_V1',
 } as const;
 
 export type SectionKey = (typeof SECTION_KEYS)[keyof typeof SECTION_KEYS];
 
 export const SECTION_METADATA = {
   [SECTION_KEYS.LANDING_CAROUSEL_V1]: {
-    name: "Banner",
-    type: "banner",
+    name: 'Banner',
     properties: {
       slides: {
         titleMain: null,
         titleHighlight: null,
         subTitle: null,
-        item: null,
+        imageUrl: null,
         alt: null,
-        type: null,
-        staticItem: {
-          name: null,
-          imageUrl: null,
-          endpoint: null,
-        },
+        href: null,
       },
       showText: null,
       height: null,

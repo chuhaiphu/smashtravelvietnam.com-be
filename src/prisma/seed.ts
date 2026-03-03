@@ -4,7 +4,6 @@ import { hash, genSalt } from 'bcrypt';
 import * as crypto from 'crypto';
 import { SECTION_METADATA } from 'src/_common/constants/section-metadata';
 
-
 const pool = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter: pool });
 
@@ -36,8 +35,8 @@ async function seedAdmin() {
       email,
       password: hashedPassword,
       name,
-      role: 'admin'
-    }
+      role: 'admin',
+    },
   });
 
   console.log('Admin user created successfully');
@@ -71,8 +70,8 @@ async function seedSuperAdmin() {
       email,
       password: hashedPassword,
       name,
-      role: 'supadmin'
-    }
+      role: 'supadmin',
+    },
   });
 
   console.log('Super admin user created successfully');
@@ -83,7 +82,7 @@ async function seedAppConfig() {
 
   // Check if app config already exists
   const existing = await prisma.appConfig.findUnique({
-    where: { id: '__singleton__' }
+    where: { id: '__singleton__' },
   });
 
   if (existing) {
@@ -97,8 +96,9 @@ async function seedAppConfig() {
       id: '__singleton__',
       maintenanceMode: false,
       websiteTitle: 'Smash Travel Vietnam',
-      websiteDescription: 'Smash Travel Vietnam is a travel agency that provides travel services to Vietnam'
-    }
+      websiteDescription:
+        'Smash Travel Vietnam is a travel agency that provides travel services to Vietnam',
+    },
   });
 
   console.log('App config created successfully');
@@ -109,7 +109,7 @@ async function seedRootTourCategory() {
 
   // Check if root tour category already exists
   const existing = await prisma.tourCategory.findUnique({
-    where: { endpoint: '__root__' }
+    where: { endpoint: '__root__' },
   });
 
   if (existing) {
@@ -122,8 +122,8 @@ async function seedRootTourCategory() {
     data: {
       title: 'NONE',
       endpoint: '__root__',
-      sortOrder: 0
-    }
+      sortOrder: 0,
+    },
   });
 
   console.log('Root tour category created successfully');
@@ -134,7 +134,7 @@ async function seedRootBlogCategory() {
 
   // Check if root blog category already exists
   const existing = await prisma.blogCategory.findUnique({
-    where: { endpoint: '__root__' }
+    where: { endpoint: '__root__' },
   });
 
   if (existing) {
@@ -147,8 +147,8 @@ async function seedRootBlogCategory() {
     data: {
       title: 'NONE',
       endpoint: '__root__',
-      sortOrder: 0
-    }
+      sortOrder: 0,
+    },
   });
 
   console.log('Root blog category created successfully');
@@ -159,7 +159,7 @@ async function seedRootMenu() {
 
   // Check if root menu already exists
   const existing = await prisma.menu.findFirst({
-    where: { isRoot: true }
+    where: { isRoot: true },
   });
 
   if (existing) {
@@ -173,8 +173,8 @@ async function seedRootMenu() {
       title: 'NONE',
       targetType: 'root',
       isRoot: true,
-      sortOrder: 0
-    }
+      sortOrder: 0,
+    },
   });
 
   console.log('Root menu created successfully');
@@ -191,15 +191,16 @@ async function seedSectionUICredentials() {
     if (!existing) {
       await prisma.sectionUICredentials.create({
         data: {
-          code: "section-ui-" + crypto.randomUUID(),
+          code: 'section-ui-' + crypto.randomUUID(),
           componentKey,
-          type: metadata.type,
           propertyFormat: metadata.properties as Prisma.InputJsonValue,
         },
       });
       console.log(`Section UI credentials "${componentKey}" created successfully`);
     } else {
-      console.log(`Section UI credentials "${componentKey}" already exists, skipping...`);
+      console.log(
+        `Section UI credentials "${componentKey}" already exists, skipping...`
+      );
     }
   }
 }
