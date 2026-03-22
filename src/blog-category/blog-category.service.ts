@@ -69,7 +69,6 @@ export class BlogCategoryService {
   }
 
   async findById(id: string): Promise<BlogCategoryResponseDto> {
-    console.log(id)
     const category = await this.prismaService.blogCategory.findUnique({
       where: { id },
       include: {
