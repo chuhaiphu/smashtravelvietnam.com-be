@@ -1,47 +1,26 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MailService } from 'src/mail/services/mail.service';
 import { CreateCustomTourRequestRequestDto } from 'src/tour/dtos/create-custom-tour-request.request.dto';
-import authConfig from 'src/_core/configs/auth.config';
 import { CustomTourRequestResponseDto } from 'src/tour/dtos/custom-tour-request.response.dto';
+import { RecaptchaService } from 'src/recaptcha/recaptcha.service';
 
 @Injectable()
 export class CustomTourRequestService {
   constructor(
     private prismaService: PrismaService,
     private mailService: MailService,
-    @Inject(authConfig.KEY)
-    private readonly authConf: ConfigType<typeof authConfig>
-  ) { }
+    private recaptchaService: RecaptchaService
+  ) {}
 
-  private async verifyRecaptcha(token: string): Promise<boolean> {
-    if (!this.authConf.recaptcha.secretKey) {
-      return true;
-    }
-
-    try {
-      const response = await fetch(
-        'https://www.google.com/recaptcha/api/siteverify',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `secret=${this.authConf.recaptcha.secretKey}&response=${token}`,
-        }
-      );
-
-      const data = (await response.json()) as { success: boolean };
-      return data.success;
-    } catch {
-      return false;
-    }
-  }
-
-  async create(dto: CreateCustomTourRequestRequestDto): Promise<CustomTourRequestResponseDto> {
+  async create(
+    dto: CreateCustomTourRequestRequestDto
+  ): Promise<CustomTourRequestResponseDto> {
     if (dto.recaptchaToken) {
-      const isValid = await this.verifyRecaptcha(dto.recaptchaToken);
+      const isValid = await this.recaptchaService.verifyToken(
+        dto.recaptchaToken,
+        'custom_tour_request_submit'
+      );
       if (!isValid) {
         throw new BadRequestException('Invalid reCAPTCHA');
       }
@@ -56,10 +35,10 @@ export class CustomTourRequestService {
         destinations: dto.destinations || [],
         tourCategoryCustomTourRequests: categoryIds?.length
           ? {
-            create: categoryIds.map((categoryId) => ({
-              tourCategoryId: categoryId,
-            })),
-          }
+              create: categoryIds.map((categoryId) => ({
+                tourCategoryId: categoryId,
+              })),
+            }
           : undefined,
       },
       include: {

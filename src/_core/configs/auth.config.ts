@@ -26,9 +26,6 @@ export interface AuthConfig {
     supAdminPassword: string;
     defaultPassword?: string;
   };
-  recaptcha: {
-    secretKey: string;
-  };
 }
 
 export default registerAs('auth', (): AuthConfig => {
@@ -60,8 +57,5 @@ export default registerAs('auth', (): AuthConfig => {
       supAdminPassword: supAdminPassword!,
       defaultPassword: 'SmashTravelVietnam@2026',
     },
-    recaptcha: {
-      secretKey: process.env.RECAPTCHA_SECRET_KEY!,
-    }
   };
 });

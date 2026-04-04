@@ -3,12 +3,14 @@ services:
     image: ${DOCKER_IMAGE}:${VERSION}
     container_name: ${DOCKER_CONTAINER_NAME}
     environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /opt/secrets/google-recaptcha-enterpise-key.json
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       VERSION: ${VERSION}
       MEDIA_BASE_URL: ${MEDIA_BASE_URL}
       UPLOAD_PATH: /app/public/media
-      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY}
+      RECAPTCHA_PROJECT_ID: ${RECAPTCHA_PROJECT_ID}
+      RECAPTCHA_SITE_KEY: ${RECAPTCHA_SITE_KEY}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       ADMIN_NAME: ${ADMIN_NAME}
@@ -17,6 +19,7 @@ services:
       SUPADMIN_NAME: ${SUPADMIN_NAME}
     volumes:
       - media_data:/app/public/media
+      - /opt/secrets/google-recaptcha-enterpise-key.json:/opt/secrets/google-recaptcha-enterpise-key.json:ro
     depends_on:
       - db
     restart: unless-stopped

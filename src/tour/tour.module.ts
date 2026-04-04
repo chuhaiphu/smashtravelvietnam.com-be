@@ -13,9 +13,10 @@ import { TourCategoryTourService } from './services/tour-category-tour.service';
 import { BookingService } from './services/booking.service';
 import { CustomTourRequestService } from './services/custom-tour-request.service';
 import { TourCategoryCustomTourRequestService } from './services/tour-category-custom-tour-request.service';
+import { RecaptchaModule } from 'src/recaptcha/recaptcha.module';
 
 @Module({
-  imports: [PrismaModule, MailModule],
+  imports: [PrismaModule, MailModule, RecaptchaModule],
   controllers: [
     TourController,
     TourCategoryController,

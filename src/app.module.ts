@@ -4,6 +4,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import appConfig from './_core/configs/auth.config';
+import recaptchaConfig from './_core/configs/recaptcha.config';
 import { AuthModule } from './auth/auth.module';
 import { AuthExceptionFilter } from './_core/filters/auth-exception.filter';
 import { AppExceptionFilter } from './_core/filters/app-exception.filter';
@@ -24,7 +25,7 @@ import { SectionUIModule } from './section-ui/section-ui.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
+      load: [appConfig, recaptchaConfig],
     }),
     MulterModule.register({
       limits: {
@@ -48,4 +49,4 @@ import { SectionUIModule } from './section-ui/section-ui.module';
   controllers: [AppController],
   providers: [AppService, AuthExceptionFilter, AppExceptionFilter],
 })
-export class AppModule { }
+export class AppModule {}
