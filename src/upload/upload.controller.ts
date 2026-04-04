@@ -13,7 +13,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UploadService } from './upload.service';
-import { UploadResponseDto } from 'src/_common/dtos/response/upload.response.dto';
+import { UploadResponseDto } from 'src/upload/dtos/upload.response.dto';
 import type {
   AuthenticatedRequest,
   HttpResponse,

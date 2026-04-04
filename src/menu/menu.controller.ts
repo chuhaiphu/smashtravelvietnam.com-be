@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
-import { CreateMenuRequestDto } from 'src/_common/dtos/request/create-menu.request.dto';
-import { UpdateMenuRequestDto } from 'src/_common/dtos/request/update-menu.request.dto';
+import { CreateMenuRequestDto } from 'src/menu/dtos/create-menu.request.dto';
+import { UpdateMenuRequestDto } from 'src/menu/dtos/update-menu.request.dto';
 import { HttpResponse } from 'src/_common/interfaces/interface';
-import { MenuResponseDto } from 'src/_common/dtos/response/menu.response.dto';
+import { MenuResponseDto } from 'src/menu/dtos/menu.response.dto';
 
 @Controller('menus')
 export class MenuController {

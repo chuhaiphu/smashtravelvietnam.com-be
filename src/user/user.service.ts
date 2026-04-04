@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { hashSync } from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserRequestDto } from 'src/_common/dtos/request/create-user.request.dto';
-import { UpdateUserRequestDto } from 'src/_common/dtos/request/update-user.request.dto';
-import { UserResponseDto } from 'src/_common/dtos/response/user.response.dto';
+import { CreateUserRequestDto } from 'src/user/dtos/create-user.request.dto';
+import { UpdateUserRequestDto } from 'src/user/dtos/update-user.request.dto';
+import { UserResponseDto } from 'src/user/dtos/user.response.dto';
 
 @Injectable()
 export class UserService {

@@ -1,12 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from 'src/prisma/generated/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSectionUICredentialsRequestDto } from 'src/_common/dtos/request/create-section-ui-credentials.request.dto';
-import { UpdateSectionUICredentialsRequestDto } from 'src/_common/dtos/request/update-section-ui-credentials.request.dto';
-import { SectionUICredentialsResponseDto } from 'src/_common/dtos/response/section-ui-credentials.response.dto';
-import { CreateDynamicSectionUIRequestDto } from 'src/_common/dtos/request/create-dynamic-section-ui.request.dto';
-import { UpdateDynamicSectionUIRequestDto } from 'src/_common/dtos/request/update-dynamic-section-ui.request.dto';
-import { DynamicSectionUIResponseDto } from 'src/_common/dtos/response/dynamic-section-ui.response.dto';
+import { CreateSectionUICredentialsRequestDto } from 'src/section-ui/dtos/create-section-ui-credentials.request.dto';
+import { UpdateSectionUICredentialsRequestDto } from 'src/section-ui/dtos/update-section-ui-credentials.request.dto';
+import { SectionUICredentialsResponseDto } from 'src/section-ui/dtos/section-ui-credentials.response.dto';
+import { CreateDynamicSectionUIRequestDto } from 'src/section-ui/dtos/create-dynamic-section-ui.request.dto';
+import { UpdateDynamicSectionUIRequestDto } from 'src/section-ui/dtos/update-dynamic-section-ui.request.dto';
+import { DynamicSectionUIResponseDto } from 'src/section-ui/dtos/dynamic-section-ui.response.dto';
 
 @Injectable()
 export class SectionUIService {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UpdateAppConfigRequestDto } from 'src/_common/dtos/request/update-app-config.request.dto';
-import { AppConfigResponseDto } from 'src/_common/dtos/response/app-config.response.dto';
+import { UpdateAppConfigRequestDto } from 'src/app-config/dtos/update-app-config.request.dto';
+import { AppConfigResponseDto } from 'src/app-config/dtos/app-config.response.dto';
 
 @Injectable()
 export class AppConfigService {

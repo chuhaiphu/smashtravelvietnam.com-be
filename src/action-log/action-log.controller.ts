@@ -9,7 +9,7 @@ import {
 import { ActionLogService } from './action-log.service';
 import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
 import { HttpResponse } from 'src/_common/interfaces/interface';
-import { ActionLogResponseDto } from 'src/_common/dtos/response/action-log.response.dto';
+import { ActionLogResponseDto } from 'src/action-log/dtos/action-log.response.dto';
 
 @Controller('admin/action-logs')
 @UseGuards(JwtAuthGuard)

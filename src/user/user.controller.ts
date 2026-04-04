@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
-import { CreateUserRequestDto } from 'src/_common/dtos/request/create-user.request.dto';
-import { UpdateUserRequestDto } from 'src/_common/dtos/request/update-user.request.dto';
+import { CreateUserRequestDto } from 'src/user/dtos/create-user.request.dto';
+import { UpdateUserRequestDto } from 'src/user/dtos/update-user.request.dto';
 import { HttpResponse } from 'src/_common/interfaces/interface';
-import { UserResponseDto } from 'src/_common/dtos/response/user.response.dto';
+import { UserResponseDto } from 'src/user/dtos/user.response.dto';
 
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard)

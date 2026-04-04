@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateMediaRequestDto } from 'src/_common/dtos/request/create-media.request.dto';
-import { UpdateMediaRequestDto } from 'src/_common/dtos/request/update-media.request.dto';
-import { MediaResponseDto } from 'src/_common/dtos/response/media.response.dto';
+import { CreateMediaRequestDto } from 'src/media/dtos/create-media.request.dto';
+import { UpdateMediaRequestDto } from 'src/media/dtos/update-media.request.dto';
+import { MediaResponseDto } from 'src/media/dtos/media.response.dto';
 
 @Injectable()
 export class MediaService {

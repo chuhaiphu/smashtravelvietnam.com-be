@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from 'src/prisma/generated/client';
-import { ActionLogResponseDto } from 'src/_common/dtos/response/action-log.response.dto';
+import { ActionLogResponseDto } from 'src/action-log/dtos/action-log.response.dto';
 
 export type ActionType = 'CREATE' | 'UPDATE' | 'DELETE';
 

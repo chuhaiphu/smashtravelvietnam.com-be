@@ -1,51 +1,61 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateMenuRequestDto } from 'src/menu/dtos/create-menu.request.dto';
-import { UpdateMenuRequestDto } from 'src/menu/dtos/update-menu.request.dto';
-import { MenuResponseDto } from 'src/menu/dtos/menu.response.dto';
+import { CreateBlogCategoryRequestDto } from 'src/blog/dtos/create-blog-category.request.dto';
+import { UpdateBlogCategoryRequestDto } from 'src/blog/dtos/update-blog-category.request.dto';
+import { BlogCategoryResponseDto } from 'src/blog/dtos/blog-category.response.dto';
 import { UPDATE_SORT_ORDER_OFFSET } from 'src/_common/constants/sort-order.constant';
 
 @Injectable()
-export class MenuService {
+export class BlogCategoryService {
   constructor(private prismaService: PrismaService) {}
 
-  async create(dto: CreateMenuRequestDto): Promise<MenuResponseDto> {
-    // Get root menu as default parent
-    const rootMenu = await this.prismaService.menu.findFirst({
-      where: { isRoot: true },
+  async create(dto: CreateBlogCategoryRequestDto): Promise<BlogCategoryResponseDto> {
+    // Check if endpoint already exists
+    const existing = await this.prismaService.blogCategory.findUnique({
+      where: { endpoint: dto.endpoint },
     });
 
-    if (!rootMenu) {
-      throw new NotFoundException('Root menu not found');
+    if (existing) {
+      throw new ConflictException('Category with this endpoint already exists');
+    }
+
+    // Get root category as default parent
+    const rootCategory = await this.prismaService.blogCategory.findUnique({
+      where: { endpoint: '__root__' },
+    });
+
+    if (!rootCategory) {
+      throw new NotFoundException('Root category not found');
     }
 
     // Get next available sortOrder under root
-    const maxSortOrder = await this.getGreatestSortOrderValue(rootMenu.id);
+    const maxSortOrder = await this.getGreatestSortOrderValue(rootCategory.id);
     const sortOrder = maxSortOrder + 1;
 
-    // Create menu
-    const menu = await this.prismaService.menu.create({
+    // Create category
+    const category = await this.prismaService.blogCategory.create({
       data: {
         title: dto.title,
-        customUrl: dto.customUrl,
-        parentId: rootMenu.id,
+        endpoint: dto.endpoint,
+        parentId: rootCategory.id,
         sortOrder,
-        targetType: 'custom', // default value
-        isRoot: false,
+        videoPosition: 'bottom', // default value
       },
       include: {
         parent: true,
-        children: {
-          orderBy: { sortOrder: 'asc' },
-        },
+        children: true,
       },
     });
 
-    return menu;
+    return category;
   }
 
-  async findAll(): Promise<MenuResponseDto[]> {
-    const menus = await this.prismaService.menu.findMany({
+  async findAll(): Promise<BlogCategoryResponseDto[]> {
+    const categories = await this.prismaService.blogCategory.findMany({
       orderBy: [
         { updatedAt: 'desc' },
       ],
@@ -55,61 +65,83 @@ export class MenuService {
       },
     });
 
-    return menus;
+    return categories;
   }
 
-  async findRootMenus(): Promise<MenuResponseDto[]> {
-    const menus = await this.prismaService.menu.findMany({
-      where: { isRoot: true },
-      orderBy: { sortOrder: 'asc' },
+  async findById(id: string): Promise<BlogCategoryResponseDto> {
+    const category = await this.prismaService.blogCategory.findUnique({
+      where: { id },
       include: {
+        parent: true,
         children: {
           orderBy: { sortOrder: 'asc' },
+        },
+        blogCategoryBlogs: {
           include: {
-            children: {
-              orderBy: { sortOrder: 'asc' },
-            },
+            blog: true,
           },
         },
       },
     });
 
-    return menus;
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return category;
   }
 
-  async findById(id: string) {
-    const menu = await this.prismaService.menu.findUnique({
-      where: { id },
+  async findByEndpoint(endpoint: string): Promise<BlogCategoryResponseDto> {
+    const category = await this.prismaService.blogCategory.findUnique({
+      where: { endpoint },
       include: {
-        parent: true,
         children: {
           orderBy: { sortOrder: 'asc' },
+        },
+        blogCategoryBlogs: {
+          where: {
+            blog: {
+              visibility: 'public',
+            },
+          },
+          include: {
+            blog: true,
+          },
         },
       },
     });
 
-    if (!menu) {
-      throw new NotFoundException('Menu not found');
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
 
-    return menu;
+    return category;
   }
 
-  async update(id: string, dto: UpdateMenuRequestDto): Promise<MenuResponseDto> {
-    const menu = await this.prismaService.menu.findUnique({
+  async update(id: string, dto: UpdateBlogCategoryRequestDto): Promise<BlogCategoryResponseDto> {
+    const category = await this.prismaService.blogCategory.findUnique({
       where: { id },
       include: {
         parent: true,
       },
     });
 
-    if (!menu) {
-      throw new NotFoundException('Menu not found');
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
 
-    const oldParentId = menu.parent?.id;
+    if (dto.endpoint && dto.endpoint !== category.endpoint) {
+      const existing = await this.prismaService.blogCategory.findUnique({
+        where: { endpoint: dto.endpoint },
+      });
+      if (existing) {
+        throw new ConflictException('Category with this endpoint already exists');
+      }
+    }
+
+    const oldParentId = category.parent?.id;
     const newParentId = dto.parentId ?? oldParentId;
-    const oldSortOrder = menu.sortOrder;
+    const oldSortOrder = category.sortOrder;
     const newSortOrder = dto.sortOrder ?? undefined;
 
     return this.prismaService.$transaction(async (tx) => {
@@ -120,7 +152,7 @@ export class MenuService {
         newSortOrder !== oldSortOrder
       ) {
         // 1. Move item out of the sort system
-        await tx.menu.update({
+        await tx.blogCategory.update({
           where: { id },
           data: { sortOrder: UPDATE_SORT_ORDER_OFFSET * -1 },
         });
@@ -128,7 +160,7 @@ export class MenuService {
         // move up (or drag up)
         if (newSortOrder < oldSortOrder) {
           // bump items between old and new sort order to temp value
-          await tx.menu.updateMany({
+          await tx.blogCategory.updateMany({
             where: {
               parentId: oldParentId,
               sortOrder: {
@@ -141,7 +173,7 @@ export class MenuService {
             },
           });
 
-          await tx.menu.updateMany({
+          await tx.blogCategory.updateMany({
             where: {
               parentId: oldParentId,
               sortOrder: {
@@ -158,7 +190,7 @@ export class MenuService {
         // move down (or drag down)
         else {
           // bump items between old and new sort order to temp value
-          await tx.menu.updateMany({
+          await tx.blogCategory.updateMany({
             where: {
               parentId: oldParentId,
               sortOrder: {
@@ -171,7 +203,7 @@ export class MenuService {
             },
           });
 
-          await tx.menu.updateMany({
+          await tx.blogCategory.updateMany({
             where: {
               parentId: oldParentId,
               sortOrder: {
@@ -185,7 +217,7 @@ export class MenuService {
           });
         }
 
-        await tx.menu.update({
+        await tx.blogCategory.update({
           where: { id },
           data: {
             sortOrder: newSortOrder,
@@ -196,7 +228,7 @@ export class MenuService {
       // ===== CASE 2: update sort order on a different parent =====
       if (oldParentId !== newParentId) {
         // 1. remove from old parent
-        await tx.menu.update({
+        await tx.blogCategory.update({
           where: { id },
           data: {
             parentId: null,
@@ -206,7 +238,7 @@ export class MenuService {
 
         // 2. compact old parent siblings sort order
         // bump items greater than old sort order to temp value
-        await tx.menu.updateMany({
+        await tx.blogCategory.updateMany({
           where: {
             parentId: oldParentId,
             sortOrder: { gt: oldSortOrder },
@@ -215,7 +247,7 @@ export class MenuService {
             sortOrder: { increment: UPDATE_SORT_ORDER_OFFSET },
           },
         });
-        await tx.menu.updateMany({
+        await tx.blogCategory.updateMany({
           where: {
             parentId: oldParentId,
             sortOrder: { gt: oldSortOrder + UPDATE_SORT_ORDER_OFFSET },
@@ -233,7 +265,7 @@ export class MenuService {
 
         // 4. shift new parent
         // bump items greater than or equal to target sort order to temp value
-        await tx.menu.updateMany({
+        await tx.blogCategory.updateMany({
           where: {
             parentId: newParentId,
             sortOrder: { gte: targetSortOrder },
@@ -242,7 +274,7 @@ export class MenuService {
             sortOrder: { increment: UPDATE_SORT_ORDER_OFFSET },
           },
         });
-        await tx.menu.updateMany({
+        await tx.blogCategory.updateMany({
           where: {
             parentId: newParentId,
             sortOrder: { gte: targetSortOrder + UPDATE_SORT_ORDER_OFFSET },
@@ -253,7 +285,7 @@ export class MenuService {
         });
 
         // 5. assign to new parent
-        await tx.menu.update({
+        await tx.blogCategory.update({
           where: { id },
           data: {
             parentId: newParentId,
@@ -262,22 +294,21 @@ export class MenuService {
         });
       }
 
-      // ===== CASE 3: update other fields (title, description, etc) =====
-      if (dto.title || dto.description !== undefined || dto.targetType !== undefined ||
-        dto.targetId !== undefined || dto.customUrl !== undefined) {
-        await tx.menu.update({
-          where: { id },
-          data: {
-            title: dto.title,
-            description: dto.description,
-            targetType: dto.targetType,
-            targetId: dto.targetId,
-            customUrl: dto.customUrl,
-          },
-        });
-      }
+      // ===== CASE 3: update other fields (title, endpoint, etc) =====
+      await tx.blogCategory.update({
+        where: { id },
+        data: {
+          title: dto.title,
+          endpoint: dto.endpoint,
+          description: dto.description,
+          videoUrl: dto.videoUrl,
+          videoThumbnailUrl: dto.videoThumbnailUrl,
+          videoPosition: dto.videoPosition,
+          mainImageUrl: dto.mainImageUrl,
+        },
+      });
 
-      const updatedMenu = await tx.menu.findUnique({
+      const updatedCategory = await tx.blogCategory.findUnique({
         where: { id },
         include: {
           parent: true,
@@ -285,49 +316,49 @@ export class MenuService {
         },
       });
 
-      if (!updatedMenu) {
-        throw new NotFoundException('Failed to update menu');
+      if (!updatedCategory) {
+        throw new NotFoundException('Failed to update blog category');
       }
 
-      return updatedMenu;
+      return updatedCategory;
     });
   }
 
   async delete(id: string) {
-    const menu = await this.prismaService.menu.findUnique({
+    const category = await this.prismaService.blogCategory.findUnique({
       where: { id },
       include: {
         parent: true,
       },
     });
 
-    if (!menu) {
-      throw new NotFoundException('Menu not found');
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
 
     await this.prismaService.$transaction(async (tx) => {
-      await tx.menu.delete({
+      await tx.blogCategory.delete({
         where: { id },
       });
 
       // compact siblings sort order
       // bump items greater than current sort order to temp value
-      await tx.menu.updateMany({
+      await tx.blogCategory.updateMany({
         where: {
-          parentId: menu.parent?.id,
+          parentId: category.parent?.id,
           sortOrder: {
-            gt: menu.sortOrder,
+            gt: category.sortOrder,
           },
         },
         data: {
           sortOrder: { increment: UPDATE_SORT_ORDER_OFFSET },
         },
       });
-      await tx.menu.updateMany({
+      await tx.blogCategory.updateMany({
         where: {
-          parentId: menu.parent?.id,
+          parentId: category.parent?.id,
           sortOrder: {
-            gt: menu.sortOrder + UPDATE_SORT_ORDER_OFFSET,
+            gt: category.sortOrder + UPDATE_SORT_ORDER_OFFSET,
           },
         },
         data: {
@@ -353,7 +384,7 @@ export class MenuService {
   }
 
   async getGreatestSortOrderValue(parentId: string | null): Promise<number> {
-    const result = await this.prismaService.menu.aggregate({
+    const result = await this.prismaService.blogCategory.aggregate({
       where: { parentId },
       _max: {
         sortOrder: true,

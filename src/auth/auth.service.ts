@@ -4,8 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 import authConfig from 'src/_core/configs/auth.config';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LocalSignInRequestDto } from 'src/_common/dtos/request/local-signin.request.dto';
-import { AuthResponseDto } from 'src/_common/dtos/response/auth.response.dto';
+import { LocalSignInRequestDto } from 'src/auth/dtos/local-signin.request.dto';
+import { AuthResponseDto } from 'src/auth/dtos/auth.response.dto';
 
 @Injectable()
 export class AuthService {

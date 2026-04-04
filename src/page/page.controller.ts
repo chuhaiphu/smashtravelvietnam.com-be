@@ -11,12 +11,12 @@ import {
 } from '@nestjs/common';
 import { PageService } from './page.service';
 import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
-import { CreatePageRequestDto } from 'src/_common/dtos/request/create-page.request.dto';
-import { UpdatePageRequestDto } from 'src/_common/dtos/request/update-page.request.dto';
+import { CreatePageRequestDto } from 'src/page/dtos/create-page.request.dto';
+import { UpdatePageRequestDto } from 'src/page/dtos/update-page.request.dto';
 import { HttpResponse } from 'src/_common/interfaces/interface';
 import { CurrentUser } from 'src/_core/decorators/current-user.decorator';
 import { JwtValidationReturn } from 'src/_common/interfaces/interface';
-import { PageResponseDto } from 'src/_common/dtos/response/page.response.dto';
+import { PageResponseDto } from 'src/page/dtos/page.response.dto';
 
 @Controller('pages')
 export class PageController {

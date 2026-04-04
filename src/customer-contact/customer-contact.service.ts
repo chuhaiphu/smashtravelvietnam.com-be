@@ -1,10 +1,10 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { MailService } from 'src/mail/mail.service';
-import { CreateCustomerContactRequestDto } from 'src/_common/dtos/request/create-customer-contact.request.dto';
+import { MailService } from 'src/mail/services/mail.service';
+import { CreateCustomerContactRequestDto } from 'src/customer-contact/dtos/create-customer-contact.request.dto';
 import authConfig from 'src/_core/configs/auth.config';
-import { CustomerContactResponseDto } from 'src/_common/dtos/response/customer-contact.response.dto';
+import { CustomerContactResponseDto } from 'src/customer-contact/dtos/customer-contact.response.dto';
 
 @Injectable()
 export class CustomerContactService {

@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePageRequestDto } from 'src/_common/dtos/request/create-page.request.dto';
-import { UpdatePageRequestDto } from 'src/_common/dtos/request/update-page.request.dto';
-import { PageResponseDto } from 'src/_common/dtos/response/page.response.dto';
+import { CreatePageRequestDto } from 'src/page/dtos/create-page.request.dto';
+import { UpdatePageRequestDto } from 'src/page/dtos/update-page.request.dto';
+import { PageResponseDto } from 'src/page/dtos/page.response.dto';
 
 @Injectable()
 export class PageService {

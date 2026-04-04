@@ -7,7 +7,7 @@ import { ConfigType } from '@nestjs/config';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import uploadConfig from 'src/_core/configs/upload.config';
-import { UploadResponseDto } from 'src/_common/dtos/response/upload.response.dto';
+import { UploadResponseDto } from 'src/upload/dtos/upload.response.dto';
 import { generateUniqueCode } from 'src/_common/helpers/code-generator.helper';
 
 @Injectable()

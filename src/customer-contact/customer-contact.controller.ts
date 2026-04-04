@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { CustomerContactService } from './customer-contact.service';
 import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
-import { CreateCustomerContactRequestDto } from 'src/_common/dtos/request/create-customer-contact.request.dto';
+import { CreateCustomerContactRequestDto } from 'src/customer-contact/dtos/create-customer-contact.request.dto';
 import { HttpResponse } from 'src/_common/interfaces/interface';
-import { CustomerContactResponseDto } from 'src/_common/dtos/response/customer-contact.response.dto';
+import { CustomerContactResponseDto } from 'src/customer-contact/dtos/customer-contact.response.dto';
 
 @Controller('contacts')
 export class CustomerContactController {

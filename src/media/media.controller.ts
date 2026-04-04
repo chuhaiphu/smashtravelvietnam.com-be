@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
-import { CreateMediaRequestDto } from 'src/_common/dtos/request/create-media.request.dto';
-import { UpdateMediaRequestDto } from 'src/_common/dtos/request/update-media.request.dto';
+import { CreateMediaRequestDto } from 'src/media/dtos/create-media.request.dto';
+import { UpdateMediaRequestDto } from 'src/media/dtos/update-media.request.dto';
 import { HttpResponse } from 'src/_common/interfaces/interface';
-import { MediaResponseDto } from 'src/_common/dtos/response/media.response.dto';
+import { MediaResponseDto } from 'src/media/dtos/media.response.dto';
 
 @Controller('admin/media')
 @UseGuards(JwtAuthGuard)

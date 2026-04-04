@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { AppConfigService } from './app-config.service';
 import { JwtAuthGuard } from 'src/_core/guards/jwt-auth.guard';
-import { UpdateAppConfigRequestDto } from 'src/_common/dtos/request/update-app-config.request.dto';
+import { UpdateAppConfigRequestDto } from 'src/app-config/dtos/update-app-config.request.dto';
 import { HttpResponse } from 'src/_common/interfaces/interface';
-import { AppConfigResponseDto } from 'src/_common/dtos/response/app-config.response.dto';
+import { AppConfigResponseDto } from 'src/app-config/dtos/app-config.response.dto';
 
 @Controller('app-config')
 export class AppConfigController {
