@@ -47,23 +47,13 @@ export class TourCategoryController {
     };
   }
 
-  @Get('admin/list')
-  @UseGuards(JwtAuthGuard)
-  async findAll(): Promise<HttpResponse<TourCategoryResponseDto[]>> {
-    const categories = await this.tourCategoryService.findAll();
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Tour categories retrieved successfully',
-      data: categories,
-    };
-  }
-
   @Get('admin/available-sort-orders/:parentId')
   @UseGuards(JwtAuthGuard)
   async findAvailableSortOrders(
     @Param('parentId') parentId: string
   ): Promise<HttpResponse<number[]>> {
-    const sortOrders = await this.tourCategoryService.findAvailableSortOrders(parentId);
+    const sortOrders =
+      await this.tourCategoryService.findAvailableSortOrders(parentId);
     return {
       statusCode: HttpStatus.OK,
       message: 'Available sort orders retrieved successfully',
@@ -73,7 +63,9 @@ export class TourCategoryController {
 
   @Get('admin/:id')
   @UseGuards(JwtAuthGuard)
-  async findById(@Param('id') id: string): Promise<HttpResponse<TourCategoryResponseDto>> {
+  async findById(
+    @Param('id') id: string
+  ): Promise<HttpResponse<TourCategoryResponseDto>> {
     const category = await this.tourCategoryService.findById(id);
     return {
       statusCode: HttpStatus.OK,
