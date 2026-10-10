@@ -45,7 +45,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          port: 22
+          port: 2222
           source: docker-compose.yml
           target: /opt/apps/smashtravelvietnam.com/be
 
@@ -55,7 +55,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          port: 22
+          port: 2222
           script: |
             mkdir -p /opt/apps/smashtravelvietnam.com/storage
             cd /opt/apps/smashtravelvietnam.com/be
