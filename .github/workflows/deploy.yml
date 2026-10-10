@@ -38,7 +38,16 @@ jobs:
             ${{ env.DOCKER_IMAGE }}:latest
           build-args: |
             VERSION=${{ steps.version.outputs.VERSION }}
-            DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@${{ secrets.VPS_HOST }}:5432/${{ secrets.POSTGRES_DB }}?schema=public
+
+      - name: Copy docker-compose.yml to VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          port: 22
+          source: docker-compose.yml
+          target: /opt/apps/smashtravelvietnam.com/be
 
       - name: Deploy to VPS using Docker Compose (Secure - No .env file)
         uses: appleboy/ssh-action@v1.0.3
@@ -46,9 +55,10 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          port: 2222
+          port: 22
           script: |
-            cd /opt/apps/smashtravelvietnam.com
+            mkdir -p /opt/apps/smashtravelvietnam.com/storage
+            cd /opt/apps/smashtravelvietnam.com/be
 
             # Set environment variables directly in shell
             export DOCKER_IMAGE="${{ env.DOCKER_IMAGE }}"

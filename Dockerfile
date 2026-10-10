@@ -5,9 +5,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 # Build-time ENV
-ARG DATABASE_URL
 ARG VERSION
-ENV DATABASE_URL=$DATABASE_URL
 ENV VERSION=$VERSION
 RUN npx prisma generate && npm run build
 

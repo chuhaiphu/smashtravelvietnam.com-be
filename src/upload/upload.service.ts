@@ -52,7 +52,7 @@ export class UploadService {
       originalName: file.originalname,
       mimetype: file.mimetype,
       size: file.size,
-      url: `${this.config.mediaBaseUrl}/${this.config.mediaFolderDomain}/${responseFolderPath}/${filename}`,
+      url: `${this.config.mediaBaseUrl}/${responseFolderPath}/${filename}`,
       path: `${folder}/${filename}`,
       uploadedAt: new Date().toISOString(),
     };

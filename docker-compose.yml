@@ -1,9 +1,11 @@
+name: smashtravelvietnam-com-be
+
 services:
   app:
     image: ${DOCKER_IMAGE}:${VERSION}
     container_name: ${DOCKER_CONTAINER_NAME}
     environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /opt/secrets/google-recaptcha-enterpise-key.json
+      GOOGLE_APPLICATION_CREDENTIALS: /opt/secrets/google-recaptcha-enterprise-key.json
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       VERSION: ${VERSION}
@@ -18,40 +20,44 @@ services:
       SUPADMIN_PASSWORD: ${SUPADMIN_PASSWORD}
       SUPADMIN_NAME: ${SUPADMIN_NAME}
     volumes:
-      - media_data:/app/public/media
-      - /opt/secrets/google-recaptcha-enterpise-key.json:/opt/secrets/google-recaptcha-enterpise-key.json:ro
+      - storage_data:/app/public/media
+      - /opt/apps/smashtravelvietnam.com/secrets/google-recaptcha-enterprise-key.json:/opt/secrets/google-recaptcha-enterprise-key.json:ro
     depends_on:
       - db
     restart: unless-stopped
+    logging:
+      driver: local
     networks:
-      - smashtravelvietnam-be
-      - vinaup-docker
+      - smashtravelvietnam-com-be
+      - nginx-proxy-manager
 
   db:
-    image: postgres:15
+    image: postgres:17
     container_name: smashtravelvietnam_postgres
-    restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    logging:
+      driver: local
     networks:
-      - smashtravelvietnam-be
+      - smashtravelvietnam-com-be
 
 volumes:
   postgres_data:
-  media_data:
+  storage_data:
     driver: local
     driver_opts:
       type: none
-      device: /opt/apps/media/smashtravelvietnam.com
+      device: /opt/apps/smashtravelvietnam.com/storage
       o: bind
 
 networks:
-  smashtravelvietnam-be:
-    name: smashtravelvietnam-be
+  smashtravelvietnam-com-be:
+    name: smashtravelvietnam-com-be
     driver: bridge
-  vinaup-docker:
+  nginx-proxy-manager:
     external: true

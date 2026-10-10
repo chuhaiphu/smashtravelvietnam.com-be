@@ -2,7 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { AuthConfig } from './_core/configs/auth.config';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigType } from '@nestjs/config';
+import uploadConfig from './_core/configs/upload.config';
 import { AppExceptionFilter } from './_core/filters/app-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
@@ -19,11 +20,15 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Serve uploaded media files
-  const uploadPath = process.env.UPLOAD_PATH || './local-uploads';
-  app.useStaticAssets(uploadPath, {
-    prefix: '/public/media/',
-  });
+  // Serve uploaded media files in dev; production serves them from nginx
+  if (process.env.NODE_ENV !== 'production') {
+    const uploadPath = process.env.UPLOAD_PATH || './local-uploads';
+    const uploadConf = app.get<ConfigType<typeof uploadConfig>>(uploadConfig.KEY);
+    const mediaPathPrefix = new URL(uploadConf.mediaBaseUrl).pathname;
+    app.useStaticAssets(uploadPath, {
+      prefix: mediaPathPrefix,
+    });
+  }
 
   app.use(cookieParser());
 
